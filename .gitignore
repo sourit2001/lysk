@@ -2,7 +2,7 @@
 node_modules/
 
 # Generated thumbnails
-images/thumbnails/
+# images/thumbnails/ (Thumbnails will be committed)
 
 # macOS
 .DS_Store
