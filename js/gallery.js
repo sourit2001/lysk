@@ -25,20 +25,20 @@ async function fetchImagesData() {
         // Map the loaded data to the structure expected by the gallery
         return images.map(img => {
             // Check for malformed or incomplete entries
-            if (!img || typeof img.path !== 'string' || img.path.trim() === '') {
-                console.warn('Skipping malformed image data entry (missing or invalid path):', img);
+            if (!img || typeof img.originalSrc !== 'string' || img.originalSrc.trim() === '' || typeof img.thumbnailSrc !== 'string' || img.thumbnailSrc.trim() === '') {
+                console.warn('Skipping malformed image data entry (missing or invalid originalSrc/thumbnailSrc):', img);
                 return null; // This entry will be filtered out
             }
 
-            // Adapt to the structure: path, title, width, height, tags
-            const imageWidth = img.width || 0;
-            const imageHeight = img.height || 0;
+            const imageWidth = img.dimensions ? img.dimensions.width : 0;
+            const imageHeight = img.dimensions ? img.dimensions.height : 0;
 
             return {
                 id: img.id || `generated-${Math.random().toString(36).substr(2, 9)}`,
-                src: img.path,
-                alt: img.title || 'Image',
-                name: img.title || 'Unnamed Image',
+                src: img.thumbnailSrc, // Use thumbnail for gallery display
+                originalSrc: img.originalSrc, // Store original source for modal
+                alt: img.name || 'Image',
+                name: img.name || 'Unnamed Image',
                 dimensions: (imageWidth && imageHeight) ? `${imageWidth}x${imageHeight}` : 'Unknown Dimensions',
                 tags: Array.isArray(img.tags) ? img.tags : []
             };
@@ -327,8 +327,8 @@ function openModal(image) {
     }
 
     // 设置模态框内容
-    modalImage.src = image.src; // Set the image source
-    modalImage.alt = image.alt;
+    modalImage.src = image.originalSrc; // Load full image in modal // Set the image source
+    modalImage.alt = image.name; // Use name for alt text, consistent with gallery
     modalTitle.textContent = image.name;
 
     // Display dimensions

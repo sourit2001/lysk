@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Generated thumbnails
+images/thumbnails/
+
+# macOS
+.DS_Store
+
+# Log files
+npm-debug.log*
+*.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
