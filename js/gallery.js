@@ -359,11 +359,18 @@ function openModal(image) {
     }
 
     // 设置下载链接
-    downloadButton.href = image.originalSrc; // Use image.originalSrc for download path
+    console.log('Setting download link to:', image.originalSrc); // Debug log
+    // Make sure we're using the full original image path, not the thumbnail
+    const originalImagePath = image.originalSrc.replace('/thumbnails/', '/original/'); 
+    downloadButton.href = originalImagePath; // Use full original image path for download
+    
     // Attempt to derive a reasonable filename, fallback if name is undefined
     const filename = image.name ? image.name.replace(/[^a-zA-Z0-9_.-]/g, '_') : 'image';
-    const extension = image.originalSrc.split('.').pop() || 'png'; // Get extension from originalSrc or default to png
+    const extension = originalImagePath.split('.').pop() || 'png'; // Get extension from originalSrc or default to png
     downloadButton.download = `${filename}.${extension}`;
+    
+    // Force browser to re-evaluate the download attribute
+    downloadButton.setAttribute('href', originalImagePath);
 
     // 显示模态框
     modal.classList.remove('hidden');
