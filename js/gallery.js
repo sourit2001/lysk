@@ -359,10 +359,10 @@ function openModal(image) {
     }
 
     // 设置下载链接
-    downloadButton.href = image.src; // Use image.src for download path
+    downloadButton.href = image.originalSrc; // Use image.originalSrc for download path
     // Attempt to derive a reasonable filename, fallback if name is undefined
     const filename = image.name ? image.name.replace(/[^a-zA-Z0-9_.-]/g, '_') : 'image';
-    const extension = image.src.split('.').pop() || 'png'; // Get extension from src or default to png
+    const extension = image.originalSrc.split('.').pop() || 'png'; // Get extension from originalSrc or default to png
     downloadButton.download = `${filename}.${extension}`;
 
     // 显示模态框
