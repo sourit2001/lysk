@@ -359,18 +359,32 @@ function openModal(image) {
     }
 
     // 设置下载链接
-    console.log('Setting download link to:', image.originalSrc); // Debug log
+    console.log('Setting download link to:', image.originalSrc, 'thumbnail was:', image.src); // Debug log
     
-    // 直接使用 originalSrc，不需要替换路径
-    downloadButton.href = image.originalSrc; // Use originalSrc directly
+    // 确保使用原图路径 - 如果 originalSrc 已经包含 thumbnails，则替换成原图路径
+    let downloadPath = image.originalSrc;
     
-    // Attempt to derive a reasonable filename, fallback if name is undefined
+    // 检查是否使用了缩略图路径
+    if (downloadPath.includes('/thumbnails/')) {
+        // 将缩略图路径替换为原图路径
+        downloadPath = downloadPath.replace('/thumbnails/', '/'); 
+        console.log('Fixed download path to:', downloadPath);
+    } else if (image.src && image.src !== image.originalSrc && image.src.includes('/thumbnails/')) {
+        // 如果 originalSrc 没有指向正确的原图，使用 src 作为基础进行转换
+        downloadPath = image.src.replace('/thumbnails/', '/');
+        console.log('Using src-based download path:', downloadPath);
+    }
+    
+    // 设置下载路径
+    downloadButton.href = downloadPath;
+    
+    // 生成文件名
     const filename = image.name ? image.name.replace(/[^a-zA-Z0-9_.-]/g, '_') : 'image';
-    const extension = image.originalSrc.split('.').pop() || 'png'; // Get extension from originalSrc
+    const extension = downloadPath.split('.').pop() || 'png'; // 使用下载路径获取文件扩展名
     downloadButton.download = `${filename}.${extension}`;
     
-    // Force browser to re-evaluate the download attribute
-    downloadButton.setAttribute('href', image.originalSrc);
+    // 强制浏览器重新评估下载属性
+    downloadButton.setAttribute('href', downloadPath);
 
     // 显示模态框
     modal.classList.remove('hidden');
