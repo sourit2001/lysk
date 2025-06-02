@@ -126,7 +126,9 @@ const languages = {
         '七夕': 'Qixi Festival',
         '樱花': 'Cherry Blossom',
         '烟花': 'Fireworks',
-        '春日': 'Spring Day'
+        '春日': 'Spring Day',
+        '写真': 'Photo Collection',
+        '动态': 'Animation'
     },
     'ja': {
         siteName: 'ラブアンドディープスペース',
@@ -164,7 +166,9 @@ const languages = {
         '七夕': '七夕祭り',
         '樱花': '桜',
         '烟花': '花火',
-        '春日': '春の日'
+        '春日': '春の日',
+        '写真': 'フォトコレクション',
+        '动态': 'アニメーション'
     },
     'ko': {
         siteName: '러브 앤 딥스페이스',
@@ -203,6 +207,8 @@ const languages = {
         '樱花': '뱀꽃',
         '烟花': '불꽃놀이',
         '春日': '봄날',
+        '写真': '사진 모음',
+        '动态': '애니메이션',
         // 分页控件
         prevPageLabel: '이전',
         nextPageLabel: '다음',
@@ -239,6 +245,8 @@ const languages = {
         '樱花': 'Fleurs de cerisier',
         '烟花': 'Feux d\'artifice',
         '春日': 'Jour de printemps',
+        '写真': 'Collection de photos',
+        '动态': 'Animation',
         // 分页控件
         prevPageLabel: 'Précédent',
         nextPageLabel: 'Suivant',
@@ -280,7 +288,9 @@ const languages = {
         '七夕': 'Qixi-Fest',
         '樱花': 'Kirschblüte',
         '烟花': 'Feuerwerk',
-        '春日': 'Frühlingstag'
+        '春日': 'Frühlingstag',
+        '写真': 'Fotosammlung',
+        '动态': 'Animation'
     }
 };
 
