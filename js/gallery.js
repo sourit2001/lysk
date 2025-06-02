@@ -329,7 +329,8 @@ function openModal(image) {
     // 设置模态框内容
     modalImage.src = image.originalSrc; // Load full image in modal // Set the image source
     modalImage.alt = image.name; // Use name for alt text, consistent with gallery
-    modalTitle.textContent = image.name;
+    // Do not display image name in title as requested
+    modalTitle.textContent = "";
 
     // Display dimensions
     if (modalDimensionsEl) {
@@ -349,10 +350,12 @@ function openModal(image) {
             tagSpan.style.backgroundColor = getTagColor(tag) + '25'; // Adding alpha for background
             tagSpan.style.color = getTagColor(tag);
             tagSpan.textContent = translateTag(tag);
+            // 保存原始标签值以便正确翻译
+            tagSpan.setAttribute('data-original-tag', tag);
             modalTagsContainer.appendChild(tagSpan);
         });
-        // Store original tags for language switching if needed (already done in createTagElement for filters)
-        // modalTagsContainer.setAttribute('data-original-tags', image.tags.join(',')); 
+        // Store all original tags for the container
+        modalTagsContainer.setAttribute('data-original-tags', image.tags.join(','));
     } else {
         const noTagsLabel = languages[currentLanguage]?.['noTagsLabel'] || 'No tags';
         modalTagsContainer.textContent = noTagsLabel;

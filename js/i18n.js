@@ -3,8 +3,20 @@
  * 支持简体中文、繁体中文、英语、日语、韩语、法语和德语
  */
 
-// 默认语言
-let currentLanguage = 'zh-CN';
+// 默认语言 (Default language - set to English)
+let currentLanguage = 'en';
+
+// 强制重置任何可能的缓存语言设置
+// Force reset any potential cached language settings
+if (window.sessionStorage) {
+    sessionStorage.removeItem('userLanguage');
+}
+if (window.localStorage) {
+    localStorage.removeItem('userLanguage');
+}
+// 确保使用英文作为默认语言
+// Ensure English is used as default language
+console.log('Forcing default language to English');
 
 // 语言数据
 const languages = {
@@ -40,7 +52,11 @@ const languages = {
         '背景': '背景',
         '主线': '主线',
         '明日无处可逃': '明日无处可逃',
-        '生日': '生日'
+        '生日': '生日',
+        '七夕': '七夕',
+        '樱花': '樱花',
+        '烟花': '烟花',
+        '春日': '春日'
     },
     'zh-TW': {
         siteName: '戀與深空',
@@ -74,7 +90,11 @@ const languages = {
         '背景': '背景',
         '主线': '主線',
         '明日无处可逃': '明日無處可逃',
-        '生日': '生日'
+        '生日': '生日',
+        '七夕': '七夕',
+        '樱花': '樱花',
+        '烟花': '煙花',
+        '春日': '春日'
     },
     'en': {
         siteName: 'Love and Deepspace',
@@ -102,7 +122,11 @@ const languages = {
         '背景': 'Background',
         '主线': 'Main Story',
         '明日无处可逃': 'No Escape Tomorrow',
-        '生日': 'Birthday'
+        '生日': 'Birthday',
+        '七夕': 'Qixi Festival',
+        '樱花': 'Cherry Blossom',
+        '烟花': 'Fireworks',
+        '春日': 'Spring Day'
     },
     'ja': {
         siteName: 'ラブアンドディープスペース',
@@ -136,7 +160,11 @@ const languages = {
         '背景': '背景',
         '主线': 'メインストーリー',
         '明日无处可逃': '明日逃げ場なし',
-        '生日': '誕生日'
+        '生日': '誕生日',
+        '七夕': '七夕祭り',
+        '樱花': '桜',
+        '烟花': '花火',
+        '春日': '春の日'
     },
     'ko': {
         siteName: '러브 앤 딥스페이스',
@@ -171,6 +199,10 @@ const languages = {
         '主线': '메인 스토리',
         '明日无处可逃': '내일 도망갈 곳 없음',
         '生日': '생일',
+        '七夕': '칠석절',
+        '樱花': '뱀꽃',
+        '烟花': '불꽃놀이',
+        '春日': '봄날',
         // 分页控件
         prevPageLabel: '이전',
         nextPageLabel: '다음',
@@ -201,8 +233,12 @@ const languages = {
         '其他': 'Autres',
         '背景': 'Arrière-plan',
         '主线': 'Histoire principale',
-        '明日无处可逃': 'Pas d\'échappatoire demain',
+        '明日无处可逃': 'Pas d\'\u00e9chappatoire demain',
         '生日': 'Anniversaire',
+        '七夕': 'Festival Qixi',
+        '樱花': 'Fleurs de cerisier',
+        '烟花': 'Feux d\'artifice',
+        '春日': 'Jour de printemps',
         // 分页控件
         prevPageLabel: 'Précédent',
         nextPageLabel: 'Suivant',
@@ -240,7 +276,11 @@ const languages = {
         '背景': 'Hintergrund',
         '主线': 'Hauptgeschichte',
         '明日无处可逃': 'Morgen kein Entkommen',
-        '生日': 'Geburtstag'
+        '生日': 'Geburtstag',
+        '七夕': 'Qixi-Fest',
+        '樱花': 'Kirschblüte',
+        '烟花': 'Feuerwerk',
+        '春日': 'Frühlingstag'
     }
 };
 
@@ -264,10 +304,34 @@ function translateTag(tag) {
 
 // 更新页面上的所有翻译内容
 function updatePageTranslations() {
+    // 翻译所有带 data-i18n 属性的元素
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         el.textContent = getTranslation(key);
     });
+    
+    // 翻译所有标签元素
+    document.querySelectorAll('.tag').forEach(tagEl => {
+        const originalTag = tagEl.getAttribute('data-tag-orig');
+        if (originalTag) {
+            const tagTextEl = tagEl.querySelector('.tag-text');
+            if (tagTextEl) {
+                tagTextEl.textContent = translateTag(originalTag);
+            }
+        }
+    });
+    
+    // 翻译模态框中的标签
+    const modalTagsContainer = document.getElementById('modal-tags');
+    if (modalTagsContainer) {
+        const tagSpans = modalTagsContainer.querySelectorAll('span');
+        tagSpans.forEach(span => {
+            const originalTag = span.getAttribute('data-original-tag');
+            if (originalTag) {
+                span.textContent = translateTag(originalTag);
+            }
+        });
+    }
     
     // 更新标签名称
     updateTagTranslations();
@@ -302,17 +366,25 @@ function updateModalTranslations() {
 
 // 初始化语言选择器
 function initLanguageSelector() {
-    // 获取浏览器语言
-    const browserLang = navigator.language || navigator.userLanguage;
+    // 强制设置英文作为默认语言，忽略所有其他设置
+    // Force English as default language, ignore all other settings
+    currentLanguage = 'en';
+    console.log('initLanguageSelector: Setting default language to English');
     
-    // 设置初始语言（如果支持浏览器语言则使用，否则默认中文）
-    if (languages[browserLang]) {
-        currentLanguage = browserLang;
-    } else if (browserLang.startsWith('zh')) {
-        currentLanguage = browserLang.includes('TW') || browserLang.includes('HK') ? 'zh-TW' : 'zh-CN';
+    // 清除可能存在的缓存
+    // Clear any potential caches
+    try {
+        if (window.localStorage) localStorage.removeItem('userLanguage');
+        if (window.sessionStorage) sessionStorage.removeItem('userLanguage');
+        if (document.cookie.indexOf('lang=') >= 0) {
+            document.cookie = 'lang=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
+    } catch (e) {
+        console.error('Error clearing language cache:', e);
     }
     
     // 设置语言选择器点击事件
+    // Set up language selector click events
     document.querySelectorAll('#language-dropdown a').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -321,22 +393,39 @@ function initLanguageSelector() {
             updatePageTranslations();
             
             // 更新当前语言显示
+            // Update current language display
             document.querySelector('#language-selector span').textContent = getTranslation('currentLang');
-            
-            // Dropdown will hide naturally when mouse leaves the group due to Tailwind's group-hover
         });
     });
     
-    // 初始更新翻译
+    // 强制更新翻译为英文
+    // Force update translations to English
     updatePageTranslations();
-
-    // Ensure dropdown is hidden initially (Tailwind's group-hover should handle this)
-    // It's generally better to rely on CSS for initial state if possible.
-    // const dropdown = document.getElementById('language-dropdown');
-    // if (dropdown) {
-    //     dropdown.classList.add('hidden'); 
-    // }
+    console.log('Translations updated to:', currentLanguage);
+    
+    // 强制设置语言选择器显示为英文
+    // Force language selector to show English
+    const langSelector = document.querySelector('#language-selector span');
+    if (langSelector) {
+        langSelector.textContent = languages['en']['currentLang'];
+        console.log('Language selector text set to English');
+    }
 }
 
+// 强制立即设置语言为英文，而不等待DOM加载
+// Immediately set language to English, don't wait for DOM loading
+(function() {
+    currentLanguage = 'en';
+    console.log('Immediately setting language to English');
+})();
+
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', initLanguageSelector);
+document.addEventListener('DOMContentLoaded', function() {
+    // Force language to English before initialization
+    currentLanguage = 'en';
+    // Then initialize selector
+    initLanguageSelector();
+    // Then apply translations
+    updatePageTranslations();
+    console.log('Final language check: Current language is', currentLanguage);
+});
