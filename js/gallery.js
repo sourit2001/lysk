@@ -6,9 +6,7 @@
 // 保存所有图片数据
 let allImages = [];
 // 当前应用的过滤器
-let activeFilters = new Set();
-
-// Pagination state
+let activeFilters = new Set(); // Stores active tag strings
 let currentPage = 1;
 const itemsPerPage = 16;
 let currentImageSet = []; // Holds the current set of images being paginated (all or filtered)
@@ -33,13 +31,28 @@ async function fetchImagesData() {
             const imageWidth = img.dimensions ? img.dimensions.width : 0;
             const imageHeight = img.dimensions ? img.dimensions.height : 0;
 
+            let imageWidthNum = 0;
+            let imageHeightNum = 0;
+            if (img.dimensions) {
+                if (typeof img.dimensions === 'string' && img.dimensions.includes('x')) {
+                    const parts = img.dimensions.split('x');
+                    imageWidthNum = parseInt(parts[0], 10) || 0;
+                    imageHeightNum = parseInt(parts[1], 10) || 0;
+                } else if (typeof img.dimensions === 'object' && img.dimensions.width && img.dimensions.height) {
+                    imageWidthNum = parseInt(img.dimensions.width, 10) || 0;
+                    imageHeightNum = parseInt(img.dimensions.height, 10) || 0;
+                }
+            }
+
             return {
                 id: img.id || `generated-${Math.random().toString(36).substr(2, 9)}`,
                 src: img.thumbnailSrc, // Use thumbnail for gallery display
                 originalSrc: img.originalSrc, // Store original source for modal
                 alt: img.name || 'Image',
                 name: img.name || 'Unnamed Image',
-                dimensions: (imageWidth && imageHeight) ? `${imageWidth}x${imageHeight}` : 'Unknown Dimensions',
+                dimensions: (imageWidthNum && imageHeightNum) ? `${imageWidthNum}x${imageHeightNum}` : 'Unknown Dimensions',
+                width: imageWidthNum,
+                height: imageHeightNum,
                 tags: Array.isArray(img.tags) ? img.tags : []
             };
         }).filter(imgObject => imgObject !== null); // Remove any null entries that were skipped
@@ -51,149 +64,71 @@ async function fetchImagesData() {
     }
 }
 
-// 创建动态标签过滤器
+// 创建动态标签过滤器 (all tags in one container)
 function createTagFilters() {
-    // 从图片数据中提取所有唯一标签
-    const characterTags = new Set();
-    const starLevelTags = new Set();
-    const otherTags = new Set();
-    
+    const allUniqueTags = new Set();
     allImages.forEach(image => {
-        image.tags.forEach(tag => {
-            // 根据tag分类
-            if (['Xaiver', 'Zayne', 'Rafayel', 'Sylus', 'Caleb'].includes(tag)) {
-                characterTags.add(tag);
-            } else if (['五星', '四星'].includes(tag)) {
-                starLevelTags.add(tag);
-            } else {
-                otherTags.add(tag);
-            }
-        });
+        if (image.tags && Array.isArray(image.tags)) {
+            image.tags.forEach(tag => allUniqueTags.add(tag));
+        }
     });
-    
-    // 创建人物标签
-    const characterTagsEl = document.getElementById('character-tags');
-    characterTagsEl.innerHTML = '';
-    
-    Array.from(characterTags).forEach(tag => {
-        characterTagsEl.appendChild(createTagElement(tag, 'character'));
-    });
-    
-    // 创建星级标签
-    const starTagsEl = document.getElementById('star-tags');
-    starTagsEl.innerHTML = '';
-    
-    Array.from(starLevelTags).forEach(tag => {
-        starTagsEl.appendChild(createTagElement(tag, 'star'));
-    });
-    
-    // 创建其他标签
-    const otherTagsEl = document.getElementById('other-tags');
-    otherTagsEl.innerHTML = '';
-    
-    Array.from(otherTags).forEach(tag => {
-        otherTagsEl.appendChild(createTagElement(tag, 'other'));
+
+    const allTagsContainer = document.getElementById('all-tags-container');
+    if (!allTagsContainer) {
+        console.error('Element with ID "all-tags-container" not found.');
+        return;
+    }
+    allTagsContainer.innerHTML = ''; // Clear previous tags
+
+    // Sort tags alphabetically for consistent order, or any other preferred order
+    const sortedTags = Array.from(allUniqueTags).sort((a, b) => a.localeCompare(b));
+
+    sortedTags.forEach(tag => {
+        allTagsContainer.appendChild(createTagElement(tag)); // Pass only the tag
     });
 }
 
-// 创建标签元素
-function createTagElement(tag, category) {
+// 创建标签元素 (simplified style, no category, no count)
+function createTagElement(tag) { // category parameter removed
     const tagEl = document.createElement('div');
-    tagEl.className = 'tag flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-200';
-    tagEl.setAttribute('data-tag', tag);
-    tagEl.setAttribute('data-tag-orig', tag);
-    tagEl.setAttribute('data-category', category);
+    // New style: clean, button-like, similar to image card style as requested
+    tagEl.className = 'tag py-1 px-2.5 bg-gray-700 text-gray-200 rounded text-xs cursor-pointer hover:bg-gray-600 transition-all duration-150 ease-in-out';
+    tagEl.dataset.tag = tag;
+    tagEl.dataset.tagOrig = tag; // For translation purposes
     
-    tagEl.innerHTML = `
-        <span class="w-4 h-4 inline-block rounded mr-2 border flex-shrink-0" style="background-color: ${getTagColor(tag)}"></span>
-        <span class="tag-text">${translateTag(tag)}</span>
-        <span class="flex-grow"></span>
-        <span class="tag-count text-xs text-gray-500"></span>
-    `;
+    const tagText = document.createElement('span');
+    tagText.className = 'tag-text';
+    tagText.textContent = translateTag(tag); // Use translated tag name via our wrapper
+    tagText.dataset.i18nTag = tag; // To find element for dynamic translation updates
     
-    // 更新标签计数
-    updateTagCount(tagEl);
+    tagEl.appendChild(tagText);
     
-    // 添加点击事件
-    tagEl.addEventListener('click', () => {
-        toggleFilter(tagEl); // Pass the element itself
+    tagEl.addEventListener('click', function() {
+        toggleFilter(this); // 'this' refers to tagEl
     });
     
     return tagEl;
 }
 
-// 获取标签颜色
-function getTagColor(tag) {
-    // 为不同的标签分配不同的颜色
-    const colorMap = {
-        // 人物
-        'Xaiver': '#3b82f6',  // 蓝色
-        'Zayne': '#8b5cf6',   // 紫色
-        'Rafayel': '#ef4444', // 红色
-        'Sylus': '#10b981',   // 绿色
-        'Caleb': '#f59e0b',   // 橙色
-        
-        // 星级
-        '五星': '#fcd34d',     // 金色
-        '四星': '#a78bfa',     // 紫色
-        
-        // 其他
-        '其他': '#9ca3af',     // 灰色
-        '背景': '#6ee7b7',     // 浅绿色
-        '主线': '#93c5fd',     // 浅蓝色
-        
-        // 默认颜色
-        'default': '#d1d5db'
-    };
-    
-    return colorMap[tag] || colorMap['default'];
-}
-
-// 更新标签的计数
-function updateTagCount(tagEl) {
-    const tag = tagEl.getAttribute('data-tag');
-    const count = allImages.filter(image => image.tags.includes(tag)).length;
-    
-    const countEl = tagEl.querySelector('.tag-count');
-    if (countEl) {
-        countEl.textContent = count;
-    }
-}
+// getTagColor function is removed as tags will have a uniform style.
 
 // 切换筛选器状态
 function toggleFilter(clickedTagEl) {
-    const clickedTag = clickedTagEl.getAttribute('data-tag');
-    const clickedCategory = clickedTagEl.getAttribute('data-category');
+    const clickedTag = clickedTagEl.dataset.tag; // Use dataset for consistency
     const wasActive = activeFilters.has(clickedTag);
 
     if (wasActive) {
-        // Deactivating the clicked tag
         activeFilters.delete(clickedTag);
-        clickedTagEl.classList.remove('bg-gray-200'); 
+        // Standard style for inactive tag (matches new initial style in createTagElement for navbar)
+        clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
+        clickedTagEl.classList.add('bg-gray-700', 'text-gray-200'); // Navbar inactive style
     } else {
-        // Activating the clicked tag
-        // 1. Deactivate other tags in the same category
-        const categoryContainerId = `${clickedCategory}-tags`; // e.g., 'character-tags', 'star-tags', 'other-tags'
-        const categoryContainer = document.getElementById(categoryContainerId);
-        if (categoryContainer) {
-            const siblingTagElements = categoryContainer.querySelectorAll('.tag');
-            siblingTagElements.forEach(siblingEl => {
-                if (siblingEl !== clickedTagEl) { // Don't deselect the one we are about to activate
-                    const siblingTag = siblingEl.getAttribute('data-tag');
-                    if (activeFilters.has(siblingTag)) {
-                        activeFilters.delete(siblingTag);
-                        siblingEl.classList.remove('bg-gray-200'); 
-                    }
-                }
-            });
-        }
-
-        // 2. Activate the clicked tag
         activeFilters.add(clickedTag);
-        clickedTagEl.classList.add('bg-gray-200');
+        // Style for active tag
+        clickedTagEl.classList.remove('bg-gray-700', 'text-gray-200'); // Remove navbar inactive style
+        clickedTagEl.classList.add('bg-blue-500', 'text-white', 'font-semibold');
     }
 
-    // 应用过滤器并更新显示
     applyFilters();
 }
 
@@ -241,24 +176,37 @@ function renderGallery(imagesToDisplay) {
 
     paginatedItems.forEach(image => {
         const imageCard = document.createElement('div');
-        imageCard.className = 'image-container bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl';
+        // Style for prominent image display, respecting aspect ratio
+        imageCard.className = 'image-card-item block w-full bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out cursor-pointer';
+
+        const aspectRatioDiv = document.createElement('div');
+        aspectRatioDiv.className = 'relative'; // For absolute positioning of the img
+
+        // Calculate padding-bottom for aspect ratio from numeric width/height
+        const imgNumericWidth = image.width && image.width > 0 ? image.width : 1;
+        const imgNumericHeight = image.height && image.height > 0 ? image.height : 1;
+        const ratioPercent = (imgNumericHeight / imgNumericWidth) * 100;
         
-        imageCard.innerHTML = `
-            <div class="relative pb-[100%]">
-                <img 
-                    src="${image.src}" 
-                    alt="${image.alt}" 
-                    class="image-thumbnail absolute top-0 left-0 w-full h-full object-cover"
-                    loading="lazy" 
-                    onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=图片加载失败';"
-                >
-            </div>
-        `;
+        aspectRatioDiv.style.paddingBottom = `${ratioPercent}%`;
+
+        const imgElement = document.createElement('img');
+        imgElement.src = image.src; // Thumbnail source
+        imgElement.alt = image.alt || image.name || '';
+        imgElement.className = 'image-thumbnail absolute top-0 left-0 w-full h-full object-cover';
+        imgElement.loading = 'lazy';
+        imgElement.onerror = function() {
+            this.onerror = null;
+            // More descriptive placeholder if needed, or a local placeholder image
+            this.src = 'https://via.placeholder.com/400x300?text=Error+Loading+Image'; 
+            console.error('Image load error:', image.src);
+        };
+
+        aspectRatioDiv.appendChild(imgElement);
+        imageCard.appendChild(aspectRatioDiv);
         
         imageCard.addEventListener('click', () => {
             openModal(image);
         });
-        
         galleryEl.appendChild(imageCard);
     });
 }
@@ -346,9 +294,8 @@ function openModal(image) {
     if (image.tags && image.tags.length > 0) {
         image.tags.forEach(tag => {
             const tagSpan = document.createElement('span');
-            tagSpan.className = 'inline-block text-xs px-2 py-1 rounded mr-1 mb-1';
-            tagSpan.style.backgroundColor = getTagColor(tag) + '25'; // Adding alpha for background
-            tagSpan.style.color = getTagColor(tag);
+            // Apply a generic, clean style for tags in the modal
+            tagSpan.className = 'inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1 mb-1';
             tagSpan.textContent = translateTag(tag);
             // 保存原始标签值以便正确翻译
             tagSpan.setAttribute('data-original-tag', tag);
@@ -405,9 +352,10 @@ function closeModal() {
 function clearAllFilters() {
     activeFilters.clear();
     
-    // 重置所有标签的视觉样式
-    document.querySelectorAll('.tag').forEach(tag => {
-        tag.classList.remove('bg-gray-200');
+    // 重置所有标签的视觉样式到默认非激活状态
+    document.querySelectorAll('.tag').forEach(tagEl => {
+        tagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
+        tagEl.classList.add('bg-gray-100', 'text-gray-800');
     });
     
     // 应用（空的）过滤器
@@ -420,17 +368,26 @@ async function initGallery() {
     loadingEl.classList.remove('hidden');
 
     allImages = await fetchImagesData();
-    currentImageSet = allImages; // Initialize currentImageSet with all images
-    
+    currentImageSet = allImages;
+    console.log(`fetchImagesData completed. Number of images loaded: ${allImages.length}`);
+
     loadingEl.classList.add('hidden');
 
     if (allImages.length > 0) {
+        const noResultsEl = document.getElementById('no-results');
+        if (noResultsEl) noResultsEl.classList.add('hidden'); // Ensure 'no results' is hidden
         createTagFilters(); 
-        renderGalleryAndPagination(currentImageSet); // Initial render with pagination
+        renderGalleryAndPagination(currentImageSet);
         updatePageTranslations(); 
-    } 
-    // If allImages is empty, fetchImagesData might have shown an error, 
-    // or gallery will be empty and no pagination controls will appear.
+    } else {
+        // Display no results message if no images were loaded and no error message was already shown by fetchImagesData
+        const galleryContainer = document.getElementById('gallery-container');
+        const noResultsEl = document.getElementById('no-results');
+        if (galleryContainer && galleryContainer.innerHTML.trim() === '') { // Check if fetchImagesData didn't already put an error
+             if (noResultsEl) noResultsEl.classList.remove('hidden');
+        }
+        console.warn('No images to display. Gallery will be empty or show an error from fetchImagesData.');
+    }
 
     const clearFiltersButton = document.getElementById('clear-filters-btn');
     if (clearFiltersButton) {
