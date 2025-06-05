@@ -65,34 +65,97 @@ async function fetchImagesData() {
 }
 
 // 创建动态标签过滤器 (all tags in one container)
-function createTagFilters() {
-    const allUniqueTags = new Set();
-    allImages.forEach(image => {
+function createTagFilters(imagesData) {
+    const allTagsContainer = document.getElementById('all-tags-container');
+    if (!allTagsContainer) {
+        console.error('Tag container #all-tags-container not found.');
+        return;
+    }
+    allTagsContainer.innerHTML = ''; // 清空现有标签
+
+    const primaryTagsOrder = [
+        "Xaiver", "Zayne", "Rafayel", "Sylus", "Caleb", 
+        "主线", "五星", "写真", "生日", 
+        "春日", "樱花", "烟花", "四星" // Added more primary tags
+    ];
+    const allUniqueTagsFromData = new Set();
+    imagesData.forEach(image => {
         if (image.tags && Array.isArray(image.tags)) {
-            image.tags.forEach(tag => allUniqueTags.add(tag));
+            image.tags.forEach(tag => allUniqueTagsFromData.add(tag.trim()));
         }
     });
 
-    const allTagsContainer = document.getElementById('all-tags-container');
-    if (!allTagsContainer) {
-        console.error('Element with ID "all-tags-container" not found.');
-        return;
-    }
-    allTagsContainer.innerHTML = ''; // Clear previous tags
+    const displayTags = [];
+    const otherTags = [];
+    const primaryTagsSet = new Set(primaryTagsOrder.map(t => t.toLowerCase())); // For case-insensitive matching if needed, though data is likely consistent
 
-    // Sort tags alphabetically for consistent order, or any other preferred order
-    const sortedTags = Array.from(allUniqueTags).sort((a, b) => a.localeCompare(b));
-
-    sortedTags.forEach(tag => {
-        allTagsContainer.appendChild(createTagElement(tag)); // Pass only the tag
+    // First, populate displayTags in the correct order
+    primaryTagsOrder.forEach(pt => {
+        // Find the tag from data that matches pt (case-sensitive for now, assuming data consistency)
+        const foundTag = Array.from(allUniqueTagsFromData).find(ut => ut === pt);
+        if (foundTag) {
+            displayTags.push(foundTag);
+        }
     });
+
+    // Collect other tags
+    allUniqueTagsFromData.forEach(tag => {
+        if (!primaryTagsOrder.includes(tag)) {
+            otherTags.push(tag);
+        }
+    });
+    otherTags.sort((a, b) => a.localeCompare(b)); // Sort other tags alphabetically
+
+    // Render primary tags
+    displayTags.forEach(tag => {
+        allTagsContainer.appendChild(createTagElement(tag));
+    });
+
+    // Handle "More" dropdown for other tags
+    if (otherTags.length > 0) {
+        const moreButtonContainer = document.createElement('div');
+        moreButtonContainer.className = 'relative group'; // For group-hover to work
+
+        const moreButton = document.createElement('button');
+        moreButton.className = 'tag filterable-tag py-1 px-2.5 bg-gray-100 text-black rounded text-base cursor-pointer hover:bg-gray-200 transition-all duration-150 ease-in-out flex items-center';
+        const moreButtonTextSpan = document.createElement('span');
+        moreButtonTextSpan.dataset.i18nKey = 'moreButtonText'; // For dynamic language switching if key is added to translations.json
+        moreButtonTextSpan.textContent = 'More'; // Set text directly to 'More'
+        
+        moreButton.appendChild(moreButtonTextSpan);
+        moreButton.innerHTML += ' <i class="fas fa-chevron-down text-xs ml-1"></i>'; // Add icon next to span
+
+        const moreDropdown = document.createElement('div');
+        moreDropdown.className = 'absolute left-0 mt-1 w-auto min-w-[150px] bg-white rounded-md shadow-lg hidden group-hover:block border border-gray-200 z-20';
+        // min-w-[150px] is an example, adjust as needed
+
+        const moreList = document.createElement('ul');
+        moreList.className = 'py-1';
+
+        otherTags.forEach(tag => {
+            const listItem = document.createElement('li');
+            const tagInDropdown = createTagElement(tag);
+            
+            // Modify class for dropdown appearance - remove button-like styles, add block/text styles
+            tagInDropdown.className = 'filterable-tag block w-full px-4 py-2 text-left text-black text-base cursor-pointer hover:bg-gray-100 transition-all duration-150 ease-in-out';
+            // Ensure dataset.tag and event listeners from createTagElement are preserved.
+            
+            listItem.appendChild(tagInDropdown);
+            moreList.appendChild(listItem);
+        });
+
+        moreDropdown.appendChild(moreList);
+        moreButtonContainer.appendChild(moreButton);
+        moreButtonContainer.appendChild(moreDropdown);
+        allTagsContainer.appendChild(moreButtonContainer);
+    }
 }
 
 // 创建标签元素 (simplified style, no category, no count)
 function createTagElement(tag) { // category parameter removed
     const tagEl = document.createElement('div');
     // New style: clean, button-like, similar to image card style as requested
-    tagEl.className = 'tag py-1 px-2.5 bg-gray-700 text-gray-200 rounded text-xs cursor-pointer hover:bg-gray-600 transition-all duration-150 ease-in-out';
+    tagEl.className = 'tag filterable-tag py-1 px-2.5 bg-white text-black rounded text-base cursor-pointer hover:bg-gray-100 transition-all duration-150 ease-in-out';
     tagEl.dataset.tag = tag;
     tagEl.dataset.tagOrig = tag; // For translation purposes
     
@@ -120,19 +183,19 @@ function toggleFilter(clickedTagEl, event) { // Add event parameter
     if (event && event.metaKey) { // CMD/CTRL click for multi-select
         if (wasActive) {
             activeFilters.delete(clickedTag);
-            clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
-            clickedTagEl.classList.add('bg-gray-700', 'text-gray-200');
+            clickedTagEl.classList.remove('bg-black', 'text-white', 'font-semibold');
+            clickedTagEl.classList.add('bg-white', 'text-black');
         } else {
             activeFilters.add(clickedTag);
-            clickedTagEl.classList.remove('bg-gray-700', 'text-gray-200');
-            clickedTagEl.classList.add('bg-blue-500', 'text-white', 'font-semibold');
+            clickedTagEl.classList.remove('bg-white', 'text-black');
+            clickedTagEl.classList.add('bg-black', 'text-white', 'font-semibold');
         }
     } else { // Normal click for single-select (or deselect if already active)
         if (wasActive) {
             // If it was active, just deactivate it
             activeFilters.delete(clickedTag);
-            clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
-            clickedTagEl.classList.add('bg-gray-700', 'text-gray-200');
+            clickedTagEl.classList.remove('bg-black', 'text-white', 'font-semibold');
+            clickedTagEl.classList.add('bg-white', 'text-black');
         } else {
             // Clicked an INACTIVE tag - SELECT IT, DESELECT OTHERS
             // 1. Update the master list of active filters.
@@ -140,14 +203,14 @@ function toggleFilter(clickedTagEl, event) { // Add event parameter
             activeFilters.add(clickedTag); // clickedTag is clickedTagEl.dataset.tag
 
             // 2. Iterate through ALL tag DOM elements and set their style.
-            const allTagElementsInDOM = document.querySelectorAll('#all-tags-container .tag'); // Corrected ID
+            const allTagElementsInDOM = document.querySelectorAll('.filterable-tag'); // Use common class
             allTagElementsInDOM.forEach(tagElementInLoop => {
-                if (tagElementInLoop === clickedTagEl) {
-                    tagElementInLoop.classList.remove('bg-gray-700', 'text-gray-200');
-                    tagElementInLoop.classList.add('bg-blue-500', 'text-white', 'font-semibold');
+                if (tagElementInLoop.dataset.tag === clickedTag) { // Compare by dataset.tag
+                    tagElementInLoop.classList.remove('bg-white', 'text-black');
+                    tagElementInLoop.classList.add('bg-black', 'text-white', 'font-semibold');
                 } else {
-                    tagElementInLoop.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
-                    tagElementInLoop.classList.add('bg-gray-700', 'text-gray-200');
+                    tagElementInLoop.classList.remove('bg-black', 'text-white', 'font-semibold');
+                    tagElementInLoop.classList.add('bg-white', 'text-black');
                 }
             });
         }
@@ -345,7 +408,7 @@ async function initGallery() {
     if (allImages.length > 0) {
         const noResultsEl = document.getElementById('no-results');
         if (noResultsEl) noResultsEl.classList.add('hidden'); // Ensure 'no results' is hidden
-        createTagFilters(); 
+        createTagFilters(allImages); 
         renderGallery(currentImageSet);
         updatePageTranslations(); 
     } else {

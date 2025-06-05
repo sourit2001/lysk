@@ -16,11 +16,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Zhi+Mang+Xing&display=swap');
         
         body {
-            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Noto Serif SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f5f5f7;
+        }
+        
+        /* Artistic site title */
+        .site-title {
+            font-family: 'Ma Shan Zheng', 'Zhi Mang Xing', cursive;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Stylish tags */
+        .filterable-tag {
+            font-family: 'ZCOOL XiaoWei', 'ZCOOL QingKe HuangYou', 'Noto Serif SC', serif;
+            transition: all 0.3s ease;
+        }
+        
+        /* Chinese characters specifically */
+        [lang="zh-CN"], .zh-text {
+            font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
         }
         
         .modal {
@@ -77,40 +94,42 @@
 </head>
 <body class="min-h-screen">
     <!-- 导航栏 -->
-    <nav class="bg-black bg-opacity-90 text-white py-4 sticky top-0 z-50 backdrop-filter backdrop-blur-lg">
-        <div class="flex items-center justify-between w-full">
+    <nav class="bg-white text-black py-3 px-4 sticky top-0 z-50 shadow-md"> <!-- Added px-4 for horizontal padding -->
+        <div class="flex flex-col w-full"> <!-- Removed container mx-auto, added w-full -->
+            <!-- First Row: Title and Language Selector -->
+            <div class="flex justify-between items-center w-full mb-1"> <!-- Reduced bottom margin -->
             <div class="flex items-center space-x-2">
                 <i class="fas fa-star text-yellow-400"></i>
-                <h1 class="text-2xl font-bold" data-i18n="siteName">恋与深空</h1>
+                <h1 class="text-2xl font-bold text-black site-title" data-i18n="siteName">恋与深空</h1>
             </div>
-            
-            <!-- 标签过滤区域 (Moved into Nav) -->
-            <div id="tag-filter-area" class="flex items-center flex-grow">
-                <div id="all-tags-container" class="flex flex-wrap gap-1.5 items-center">
-                    <!-- Tags will be styled for navbar -->
-                </div>
-            </div>
-
-            <!-- 语言选择 -->
+            <!-- Language Selector -->
             <div class="relative group">
-                <button id="language-selector" class="flex items-center space-x-1 bg-gray-800 px-3 py-1 rounded hover:bg-gray-700">
+                <button id="language-selector" class="flex items-center space-x-1 bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200">
                     <i class="fas fa-globe"></i>
                     <span data-i18n="currentLang">中文简体</span>
                     <i class="fas fa-chevron-down text-xs"></i>
                 </button>
-                <div id="language-dropdown" class="absolute right-0 bg-gray-800 rounded shadow-lg hidden group-hover:block">
+                <div id="language-dropdown" class="absolute right-0 mt-1 bg-gray-100 text-black rounded shadow-lg hidden group-hover:block border border-gray-200 z-10">
                     <ul class="py-1">
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="zh-CN">中文简体</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="zh-TW">中文繁體</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="en">English</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="ja">日本語</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="ko">한국어</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="fr">Français</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-700" data-lang="de">Deutsch</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-CN">中文简体</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-TW">中文繁體</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="en">English</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="ja">日本語</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="ko">한국어</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="fr">Français</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="de">Deutsch</a></li>
                     </ul>
                 </div>
             </div>
-        </div>
+            </div> <!-- End of First Row -->
+
+            <!-- Second Row: Tag Filters -->
+            <div id="tag-filter-area" class="w-full flex items-center flex-grow mt-1"> <!-- Reduced top margin -->
+                <div id="all-tags-container" class="flex flex-wrap gap-1.5 items-center">
+                    <!-- Tags will be styled for navbar -->
+                </div>
+            </div>
+        </div> <!-- End of main flex container -->
     </nav>
 
     <!-- 主内容区 -->
