@@ -294,22 +294,23 @@ function renderGallery(imagesToDisplay) {
 
         // Calculate and set grid-row-end span
         requestAnimationFrame(() => {
-            let currentImgNumericWidth = image.width && image.width > 0 ? image.width : 16; // Default aspect ratio if data missing (e.g., 16:9)
-            let currentImgNumericHeight = image.height && image.height > 0 ? image.height : 9;
+            let calcWidth = image.width && image.width > 0 ? image.width : 16; // Default aspect ratio if data missing (e.g., 16:9)
+            let calcHeight = image.height && image.height > 0 ? image.height : 9;
 
-            if (isAnimated) {
-                // If the animated image is landscape, force its preview card to a 3:4 portrait aspect ratio.
-                if (currentImgNumericWidth > currentImgNumericHeight) {
-                    currentImgNumericWidth = 3;  // Standard portrait width part for preview
-                    currentImgNumericHeight = 4; // Standard portrait height part for preview
-                }
-                // If animated image is already portrait or square, its original dimensions will be used.
+            if (isAnimated && (calcWidth > calcHeight)) { // Landscape animated image
+                // Force card aspect ratio to 3:4 for calculation, to match portrait cards
+                calcWidth = 3;
+                calcHeight = 4;
             }
+            // For non-animated, or portrait/square animated, use their original aspect ratio for calcWidth/calcHeight.
             
             const cardClientWidth = imageCard.clientWidth; // Get actual width in the grid column
-            
-            // Calculate the target height of the card to maintain image aspect ratio
-            const targetCardHeight = (currentImgNumericHeight / currentImgNumericWidth) * cardClientWidth;
+            let targetCardHeight = (calcHeight / calcWidth) * cardClientWidth;
+
+            // If it's an animated image, reduce its calculated card height to make the preview smaller.
+            if (isAnimated) {
+                targetCardHeight *= 0.8; // Make animated previews 20% smaller in height.
+            }
             
             const rowSpan = Math.ceil((targetCardHeight + gridGap) / (gridAutoRowHeight + gridGap));
             imageCard.style.gridRowEnd = `span ${rowSpan > 0 ? rowSpan : 1}`; // Ensure span is at least 1

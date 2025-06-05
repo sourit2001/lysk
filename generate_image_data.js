@@ -57,9 +57,15 @@ async function scanDirectory(dirPath) { // Changed to async to handle sharp prom
                 const thumbnailRelativePath = path.relative(__dirname, thumbnailFullPath).replace(/\\/g, '/');
 
                 try {
-                    await sharp(itemPath)
+                    let imageProcessor;
+                    if (path.extname(itemPath).toLowerCase() === '.gif') {
+                        imageProcessor = sharp(itemPath, { animated: true }); // Enable reading all frames for animated GIF
+                    } else {
+                        imageProcessor = sharp(itemPath);
+                    }
+                    await imageProcessor
                         .resize({ width: 400 }) // 设置缩略图宽度为400px，高度自动按比例调整
-                        .toFile(thumbnailFullPath);
+                        .toFile(thumbnailFullPath); // sharp will attempt to write an animated GIF if the input was animated
                     console.log(`已生成缩略图: ${thumbnailFullPath}`);
                 } catch (thumbErr) {
                     console.error(`无法为 ${itemPath} 生成缩略图: ${thumbErr.message}`);
