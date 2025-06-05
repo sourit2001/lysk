@@ -59,36 +59,51 @@
         }
     </style>
     <style>
+        /* CSS Grid Masonry Layout */
         #gallery-container {
-            column-gap: 1rem; /* Corresponds to Tailwind's gap-4 */
-            /* Responsive column counts */
-            column-count: 2;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default 2 columns for mobile */
+            gap: 0.75rem;
+            width: 100%;
+            grid-auto-rows: 10px; /* Granularity for masonry effect; items will span multiples of this height */
+            grid-auto-flow: row dense; /* Fill rows, then pack densely to fill gaps */
         }
-        @media (min-width: 640px) { /* sm */
+
+        @media (min-width: 640px) { /* sm screen: 3 columns */
             #gallery-container {
-                column-count: 3;
+                grid-template-columns: repeat(3, 1fr);
             }
         }
-        @media (min-width: 768px) { /* md */
+        
+        @media (min-width: 1024px) { /* lg screen: 4 columns */
             #gallery-container {
-                column-count: 4;
+                grid-template-columns: repeat(4, 1fr);
             }
         }
-        @media (min-width: 1024px) { /* lg */
-            #gallery-container {
-                column-count: 4; /* Reduced from 5 */
-            }
-        }
-        @media (min-width: 1280px) { /* xl */
-            #gallery-container {
-                column-count: 4; /* Reduced from 6 */
-            }
-        }
+
+        /* Image card styling for Grid Masonry */
         .image-card-item {
-            break-inside: avoid; /* Prevent items from breaking across columns */
-            margin-bottom: 1rem; /* Add some space below each item, similar to a row-gap */
-            display: inline-block; /* Important for column flow */
-            width: 100%; /* Ensure items take full width of their column slot */
+            width: 100%; /* Item takes full width of its grid column */
+            /* height: auto; Height is determined by content and grid-row-end span */
+            overflow: hidden; /* Recommended if content might exceed calculated span */
+            /* grid-row-end will be set by JavaScript */
+        }
+
+        .image-card-item .relative {
+            width: 100%;
+            height: 100%; /* The aspect ratio div should fill the card if card height is set by span */
+        }
+
+        .image-thumbnail {
+            width: 100%;
+            height: 100%; /* Image fills its container (aspectRatioDiv) */
+            display: block;
+            /* object-fit is handled by .animated-content or JS-added class */
+        }
+
+        .image-card-item.animated-content .image-thumbnail {
+            object-fit: contain;
+            background-color: #f0f0f0; /* Optional background for 'contain' */
         }
     </style>
 </head>

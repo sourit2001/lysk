@@ -244,51 +244,80 @@ function applyFilters() {
     renderGallery(currentImageSet); 
 }
 
-// 渲染图库 
+// 渲染图库
 function renderGallery(imagesToDisplay) {
     const galleryEl = document.getElementById('gallery-container');
     galleryEl.innerHTML = ''; // Clear previous items
 
-    // No pagination, render all imagesToDisplay
     if (imagesToDisplay.length === 0) {
-        // No-results message is handled by applyFilters or initGallery, so just return if empty
         return;
     }
 
-    imagesToDisplay.forEach(image => {
+    // Assuming #gallery-container is styled with display:grid and grid-auto-rows in CSS.
+    const gridAutoRowHeight = 10; // Must match grid-auto-rows in CSS (e.g., 10px)
+    const gapStyle = getComputedStyle(galleryEl).gap;
+    // A simple way to get the first gap value if it's like "12px 12px" or just "12px"
+    // More robust parsing might be needed for complex gap values.
+    const gridGap = parseFloat(gapStyle.split(' ')[0]) || 8; // Default to 8px if parsing fails
+
+    imagesToDisplay.forEach((image) => {
         const imageCard = document.createElement('div');
-        // Style for prominent image display, respecting aspect ratio
-        imageCard.className = 'image-card-item block w-full bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out cursor-pointer';
-
-        const aspectRatioDiv = document.createElement('div');
-        aspectRatioDiv.className = 'relative'; // For absolute positioning of the img
-
-        // Calculate padding-bottom for aspect ratio from numeric width/height
-        const imgNumericWidth = image.width && image.width > 0 ? image.width : 1;
-        const imgNumericHeight = image.height && image.height > 0 ? image.height : 1;
-        const ratioPercent = (imgNumericHeight / imgNumericWidth) * 100;
-        
-        aspectRatioDiv.style.paddingBottom = `${ratioPercent}%`;
+        imageCard.className = 'image-card-item bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out cursor-pointer';
 
         const imgElement = document.createElement('img');
-        imgElement.src = image.src; // Thumbnail source
+        imgElement.src = image.src;
         imgElement.alt = image.alt || image.name || '';
-        imgElement.className = 'image-thumbnail absolute top-0 left-0 w-full h-full object-cover';
+        // Image fills the card. Card's height will be set by grid-row-end.
+        imgElement.className = 'image-thumbnail w-full h-full'; 
         imgElement.loading = 'lazy';
+
+        const isAnimated = image.originalSrc && (
+            image.originalSrc.toLowerCase().endsWith('.gif') ||
+            image.originalSrc.toLowerCase().endsWith('.webp') ||
+            image.originalSrc.toLowerCase().includes('animated')
+        );
+
+        if (isAnimated) {
+            imageCard.classList.add('animated-content'); // CSS applies object-fit: contain
+        } else {
+            imgElement.classList.add('object-cover'); // Default to cover for static images
+        }
+        
         imgElement.onerror = function() {
             this.onerror = null;
-            // More descriptive placeholder if needed, or a local placeholder image
-            this.src = 'https://via.placeholder.com/400x300?text=Error+Loading+Image'; 
+            this.src = 'https://via.placeholder.com/400x300?text=Error+Loading+Image';
             console.error('Image load error:', image.src);
         };
 
-        aspectRatioDiv.appendChild(imgElement);
-        imageCard.appendChild(aspectRatioDiv);
-        
+        imageCard.appendChild(imgElement);
+        galleryEl.appendChild(imageCard); // Append card to DOM to get its width
+
+        // Calculate and set grid-row-end span
+        requestAnimationFrame(() => {
+            let currentImgNumericWidth = image.width && image.width > 0 ? image.width : 16; // Default aspect ratio if data missing (e.g., 16:9)
+            let currentImgNumericHeight = image.height && image.height > 0 ? image.height : 9;
+
+            if (isAnimated) {
+                // If the animated image is landscape, force its preview card to a 3:4 portrait aspect ratio.
+                if (currentImgNumericWidth > currentImgNumericHeight) {
+                    currentImgNumericWidth = 3;  // Standard portrait width part for preview
+                    currentImgNumericHeight = 4; // Standard portrait height part for preview
+                }
+                // If animated image is already portrait or square, its original dimensions will be used.
+            }
+            
+            const cardClientWidth = imageCard.clientWidth; // Get actual width in the grid column
+            
+            // Calculate the target height of the card to maintain image aspect ratio
+            const targetCardHeight = (currentImgNumericHeight / currentImgNumericWidth) * cardClientWidth;
+            
+            const rowSpan = Math.ceil((targetCardHeight + gridGap) / (gridAutoRowHeight + gridGap));
+            imageCard.style.gridRowEnd = `span ${rowSpan > 0 ? rowSpan : 1}`; // Ensure span is at least 1
+        });
+
         imageCard.addEventListener('click', () => {
             openModal(image);
         });
-        galleryEl.appendChild(imageCard);
     });
 }
 
