@@ -40,6 +40,8 @@ async function scanDirectory(dirPath) { // Changed to async to handle sharp prom
             try {
                 const buffer = fs.readFileSync(itemPath);
                 const dimensions = sizeOf(buffer);
+                const fileStats = fs.statSync(itemPath);
+                const modificationTime = fileStats.mtimeMs; // Get modification time in milliseconds
                 const originalRelativePath = path.relative(__dirname, itemPath).replace(/\\/g, '/');
                 const fileName = path.basename(itemPath);
                 const tags = getTagsFromPath(itemPath, imagesBaseDir);
@@ -70,7 +72,8 @@ async function scanDirectory(dirPath) { // Changed to async to handle sharp prom
                     thumbnailSrc: thumbnailRelativePath,
                     name: fileName, // Changed 'title' to 'name' for consistency with gallery.js expectations
                     dimensions: { width: dimensions.width, height: dimensions.height }, // Original dimensions
-                    tags: tags
+                    tags: tags,
+                    modified: modificationTime // Add modification time
                 });
             } catch (err) {
                 console.error(`无法处理文件 ${itemPath}: ${err.message}`);

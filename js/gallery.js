@@ -7,9 +7,7 @@
 let allImages = [];
 // 当前应用的过滤器
 let activeFilters = new Set(); // Stores active tag strings
-let currentPage = 1;
-const itemsPerPage = 16;
-let currentImageSet = []; // Holds the current set of images being paginated (all or filtered)
+let currentImageSet = []; // Holds the current set of images (all or filtered)
 
 // 模拟扫描images文件夹的函数（在实际部署中，这里需要由后端生成数据）
 // 由于我们不能直接访问文件系统，这里模拟数据结构
@@ -53,9 +51,11 @@ async function fetchImagesData() {
                 dimensions: (imageWidthNum && imageHeightNum) ? `${imageWidthNum}x${imageHeightNum}` : 'Unknown Dimensions',
                 width: imageWidthNum,
                 height: imageHeightNum,
-                tags: Array.isArray(img.tags) ? img.tags : []
+                tags: Array.isArray(img.tags) ? img.tags : [],
+                modified: img.modified // Add modified timestamp
             };
-        }).filter(imgObject => imgObject !== null); // Remove any null entries that were skipped
+        }).filter(imgObject => imgObject !== null) // Remove any null entries that were skipped
+          .sort((a, b) => (b.modified || 0) - (a.modified || 0)); // Sort by modification time, newest first
     } catch (error) {
         console.error('加载图片数据失败 (Failed to load image data):', error);
         document.getElementById('gallery-container').innerHTML = 
@@ -103,8 +103,8 @@ function createTagElement(tag) { // category parameter removed
     
     tagEl.appendChild(tagText);
     
-    tagEl.addEventListener('click', function() {
-        toggleFilter(this); // 'this' refers to tagEl
+    tagEl.addEventListener('click', function(event) { // Capture event object
+        toggleFilter(this, event); // Pass both element and event
     });
     
     return tagEl;
@@ -113,20 +113,44 @@ function createTagElement(tag) { // category parameter removed
 // getTagColor function is removed as tags will have a uniform style.
 
 // 切换筛选器状态
-function toggleFilter(clickedTagEl) {
-    const clickedTag = clickedTagEl.dataset.tag; // Use dataset for consistency
+function toggleFilter(clickedTagEl, event) { // Add event parameter
+    const clickedTag = clickedTagEl.dataset.tag;
     const wasActive = activeFilters.has(clickedTag);
 
-    if (wasActive) {
-        activeFilters.delete(clickedTag);
-        // Standard style for inactive tag (matches new initial style in createTagElement for navbar)
-        clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
-        clickedTagEl.classList.add('bg-gray-700', 'text-gray-200'); // Navbar inactive style
-    } else {
-        activeFilters.add(clickedTag);
-        // Style for active tag
-        clickedTagEl.classList.remove('bg-gray-700', 'text-gray-200'); // Remove navbar inactive style
-        clickedTagEl.classList.add('bg-blue-500', 'text-white', 'font-semibold');
+    if (event && event.metaKey) { // CMD/CTRL click for multi-select
+        if (wasActive) {
+            activeFilters.delete(clickedTag);
+            clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
+            clickedTagEl.classList.add('bg-gray-700', 'text-gray-200');
+        } else {
+            activeFilters.add(clickedTag);
+            clickedTagEl.classList.remove('bg-gray-700', 'text-gray-200');
+            clickedTagEl.classList.add('bg-blue-500', 'text-white', 'font-semibold');
+        }
+    } else { // Normal click for single-select (or deselect if already active)
+        if (wasActive) {
+            // If it was active, just deactivate it
+            activeFilters.delete(clickedTag);
+            clickedTagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
+            clickedTagEl.classList.add('bg-gray-700', 'text-gray-200');
+        } else {
+            // Clicked an INACTIVE tag - SELECT IT, DESELECT OTHERS
+            // 1. Update the master list of active filters.
+            activeFilters.clear();
+            activeFilters.add(clickedTag); // clickedTag is clickedTagEl.dataset.tag
+
+            // 2. Iterate through ALL tag DOM elements and set their style.
+            const allTagElementsInDOM = document.querySelectorAll('#all-tags-container .tag'); // Corrected ID
+            allTagElementsInDOM.forEach(tagElementInLoop => {
+                if (tagElementInLoop === clickedTagEl) {
+                    tagElementInLoop.classList.remove('bg-gray-700', 'text-gray-200');
+                    tagElementInLoop.classList.add('bg-blue-500', 'text-white', 'font-semibold');
+                } else {
+                    tagElementInLoop.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
+                    tagElementInLoop.classList.add('bg-gray-700', 'text-gray-200');
+                }
+            });
+        }
     }
 
     applyFilters();
@@ -136,7 +160,7 @@ function toggleFilter(clickedTagEl) {
 function applyFilters() {
     const noResultsEl = document.getElementById('no-results');
     
-    currentPage = 1; // Reset to first page when filters change
+    // currentPage = 1; // No longer needed as there's no pagination
 
     let imagesToProcess;
     if (activeFilters.size === 0) {
@@ -153,28 +177,22 @@ function applyFilters() {
             noResultsEl.classList.add('hidden');
         }
     }
-    currentImageSet = imagesToProcess; // Update the current set for pagination
-    renderGalleryAndPagination(currentImageSet); 
+    currentImageSet = imagesToProcess; // Update the current set
+    renderGallery(currentImageSet); 
 }
 
-// 渲染图库 (now paginated)
+// 渲染图库 
 function renderGallery(imagesToDisplay) {
     const galleryEl = document.getElementById('gallery-container');
     galleryEl.innerHTML = ''; // Clear previous items
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedItems = imagesToDisplay.slice(startIndex, endIndex);
-
-    if (paginatedItems.length === 0 && imagesToDisplay.length > 0 && currentPage > 1) {
-        // This case means we are on a page that no longer exists after filtering, try going to page 1
-        // This should ideally be handled by resetting currentPage in applyFilters
-        // For now, this will just render an empty gallery for this page.
-    } else if (paginatedItems.length === 0 && imagesToDisplay.length === 0 && activeFilters.size > 0) {
-        // This is handled by applyFilters showing noResultsEl
+    // No pagination, render all imagesToDisplay
+    if (imagesToDisplay.length === 0) {
+        // No-results message is handled by applyFilters or initGallery, so just return if empty
+        return;
     }
 
-    paginatedItems.forEach(image => {
+    imagesToDisplay.forEach(image => {
         const imageCard = document.createElement('div');
         // Style for prominent image display, respecting aspect ratio
         imageCard.className = 'image-card-item block w-full bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out cursor-pointer';
@@ -209,55 +227,6 @@ function renderGallery(imagesToDisplay) {
         });
         galleryEl.appendChild(imageCard);
     });
-}
-
-// 渲染分页控件 (shows clickable page numbers)
-function renderPaginationControls(totalItems) {
-    const controlsContainer = document.getElementById('pagination-controls');
-    controlsContainer.innerHTML = ''; // Clear old controls
-
-    if (totalItems === 0) {
-        return; // No items, no pagination
-    }
-
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-    if (totalPages <= 1) {
-        return; // Only one page (or no pages if totalItems was >0 but < itemsPerPage leading to totalPages=1), no controls needed
-    }
-
-    const ul = document.createElement('ul');
-    ul.className = 'flex justify-center items-center space-x-1'; // Tailwind for list styling
-
-    for (let i = 1; i <= totalPages; i++) {
-        const li = document.createElement('li');
-        const pageButton = document.createElement('button');
-        pageButton.textContent = i;
-        // Base styling for page buttons
-        pageButton.className = 'px-3 py-1 rounded text-sm transition-colors duration-150 ease-in-out'; 
-
-        if (i === currentPage) {
-            // Active page styling
-            pageButton.classList.add('bg-blue-500', 'text-white', 'font-semibold', 'cursor-default');
-            pageButton.disabled = true; // Disable clicking the current page
-        } else {
-            // Inactive page styling
-            pageButton.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-700');
-            pageButton.addEventListener('click', () => {
-                currentPage = i;
-                renderGalleryAndPagination(currentImageSet);
-            });
-        }
-        li.appendChild(pageButton);
-        ul.appendChild(li);
-    }
-    controlsContainer.appendChild(ul);
-}
-
-// Helper to render both gallery and pagination
-function renderGalleryAndPagination(images) {
-    renderGallery(images); 
-    renderPaginationControls(images.length);
 }
 
 // 打开模态框
@@ -377,7 +346,7 @@ async function initGallery() {
         const noResultsEl = document.getElementById('no-results');
         if (noResultsEl) noResultsEl.classList.add('hidden'); // Ensure 'no results' is hidden
         createTagFilters(); 
-        renderGalleryAndPagination(currentImageSet);
+        renderGallery(currentImageSet);
         updatePageTranslations(); 
     } else {
         // Display no results message if no images were loaded and no error message was already shown by fetchImagesData
