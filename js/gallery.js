@@ -46,7 +46,26 @@ async function fetchImagesData() {
                 id: img.id || `generated-${Math.random().toString(36).substr(2, 9)}`,
                 src: img.thumbnailSrc, // Use thumbnail for gallery display
                 originalSrc: img.originalSrc, // Store original source for modal
-                alt: img.name || 'Image',
+                // Enhanced alt text generation
+                alt: (() => {
+                    let altText = "恋与深空"; // Base alt text
+                    const imageName = img.name;
+                    const imageTags = Array.isArray(img.tags) ? img.tags : [];
+
+                    if (imageName && imageName.toLowerCase() !== 'unnamed image' && imageName.toLowerCase() !== 'image' && imageName.trim() !== '') {
+                        altText += ` - ${imageName.trim()}`;
+                    }
+
+                    if (imageTags.length > 0) {
+                        const relevantTags = imageTags.slice(0, 3).join(', '); // Use up to first 3 tags
+                        altText += ` - ${relevantTags}`;
+                    }
+
+                    if (altText === "恋与深空") {
+                        altText += " 游戏图片"; // Fallback if no specific name or tags
+                    }
+                    return altText;
+                })(),
                 name: img.name || 'Unnamed Image',
                 dimensions: (imageWidthNum && imageHeightNum) ? `${imageWidthNum}x${imageHeightNum}` : 'Unknown Dimensions',
                 width: imageWidthNum,
