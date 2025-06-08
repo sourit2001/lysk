@@ -39,6 +39,8 @@ const languages = {
         imageTags: '标签',
         downloadImage: '下载图片',
         currentLang: '中文简体',
+        siteNameGallery: '恋与深空 图库',
+        siteNavDescription: '探索《恋与深空》的精彩瞬间',
         // 角色名称
         Xaiver: '沈星回',
         Zayne: '黎深',
@@ -77,12 +79,14 @@ const languages = {
         imageTags: '標籤',
         downloadImage: '下載圖片',
         currentLang: '中文繁體',
+        siteNameGallery: '戀與深空 圖庫',
+        siteNavDescription: '探索《戀與深空》的精彩瞬間',
         // 角色名称
         Xaiver: '沈星回',
         Zayne: '黎深',
         Rafayel: '祁煜',
-        Sylus: '秦徹',
-        Caleb: '夏以晝',
+        Sylus: '秦彻',
+        Caleb: '夏以昼',
         // 标签
         '五星': '五星',
         '四星': '四星',
@@ -109,6 +113,8 @@ const languages = {
         imageTags: 'Tags',
         downloadImage: 'Download Image',
         currentLang: 'English',
+        siteNameGallery: 'Love and Deepspace Gallery',
+        siteNavDescription: 'Explore the wonderful moments of Love and Deepspace',
         // 角色名称
         Xaiver: 'Xaiver',
         Zayne: 'Zayne',
@@ -149,6 +155,8 @@ const languages = {
         imageTags: 'タグ',
         downloadImage: '画像をダウンロード',
         currentLang: '日本語',
+        siteNameGallery: 'ラブアンドディープスペース ギャラリー',
+        siteNavDescription: '『恋と深空』の素晴らしい瞬間を探索',
         // 角色名称
         Xaiver: 'シェン・シンフイ',
         Zayne: 'リー・シェン',
@@ -189,6 +197,8 @@ const languages = {
         imageTags: '태그',
         downloadImage: '이미지 다운로드',
         currentLang: '한국어',
+        siteNameGallery: '러브 앤 딥스페이스 갤러리',
+        siteNavDescription: '『러브앤딥스페이스』의 멋진 순간들을 탐험하세요',
         // 角色名称
         Xaiver: '선성회',
         Zayne: '여심',
@@ -227,6 +237,8 @@ const languages = {
         imageTags: 'Tags',
         downloadImage: 'Télécharger l\'image',
         currentLang: 'Français',
+        siteNameGallery: 'Galerie Love and Deepspace',
+        siteNavDescription: 'Explorez les moments merveilleux de Love and Deepspace',
         // 角色名称
         Xaiver: 'Xaiver',
         Zayne: 'Zayne',
@@ -271,6 +283,8 @@ const languages = {
         imageTags: 'Tags',
         downloadImage: 'Bild herunterladen',
         currentLang: 'Deutsch',
+        siteNameGallery: 'Love and Deepspace Galerie',
+        siteNavDescription: 'Entdecken Sie die wundervollen Momente von Love and Deepspace',
         // 角色名称
         Xaiver: 'Xaiver',
         Zayne: 'Zayne',
@@ -356,11 +370,10 @@ function updatePageTranslations() {
 // 更新标签翻译
 function updateTagTranslations() {
     // 更新标签显示
-    document.querySelectorAll('[data-tag-orig]').forEach(el => {
-        const originalTag = el.getAttribute('data-tag-orig');
-        const tagText = el.querySelector('.tag-text');
-        if (tagText) {
-            tagText.textContent = translateTag(originalTag);
+    document.querySelectorAll('span.tag-text[data-i18n-tag]').forEach(tagTextEl => {
+        const originalTagKey = tagTextEl.getAttribute('data-i18n-tag');
+        if (originalTagKey) {
+            tagTextEl.textContent = translateTag(originalTagKey);
         }
     });
 }
@@ -400,6 +413,7 @@ function initLanguageSelector() {
             e.preventDefault();
             console.log('Language link clicked:', this.getAttribute('data-lang')); // Debug log
             currentLanguage = this.getAttribute('data-lang');
+            document.documentElement.lang = currentLanguage; // Set lang attribute
             updatePageTranslations();
             
             // 更新当前语言显示
@@ -426,6 +440,7 @@ function initLanguageSelector() {
 // Immediately set language to English, don't wait for DOM loading
 (function() {
     currentLanguage = 'en';
+    document.documentElement.lang = currentLanguage; // Set lang attribute
     console.log('Immediately setting language to English');
 })();
 
@@ -433,6 +448,7 @@ function initLanguageSelector() {
 document.addEventListener('DOMContentLoaded', function() {
     // Force language to English before initialization
     currentLanguage = 'en';
+    document.documentElement.lang = currentLanguage; // Set lang attribute
     // Then initialize selector
     initLanguageSelector();
     // Then apply translations

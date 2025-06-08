@@ -12,35 +12,88 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>恋与深空 - Love and Deepspace</title>
+    <title>恋与深空 - Love and Deepspace Gallery</title>
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="恋与深空 - Love and Deepspace Image Gallery" />
     <meta property="og:description" content="探索《恋与深空》的精彩瞬间和高清壁纸。" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="YOUR_WEBSITE_URL_HERE" /> <!-- 请将这里替换为您的网站完整URL -->
-    <meta property="og:image" content="YOUR_FEATURED_IMAGE_URL_HERE" /> <!-- 请将这里替换为一张特色图片的完整URL (建议尺寸 1200x630px) -->
+    <meta property="og:url" content="https://loveanddeepspace.online" /> <!-- 请将这里替换为您的网站完整URL -->
+    <meta property="og:image" content="https://loveanddeepspace.online/images/Sylus/%E8%83%8C%E6%99%AF/videoframe_84400.png" /> <!-- 请将这里替换为一张特色图片的完整URL (建议尺寸 1200x630px) -->
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="探索《恋与深空》的精彩瞬间和高清壁纸。一个为爱好者们打造的《恋与深空》主题图片画廊，包含角色、场景、剧情截图等。Love and Deepspace image gallery for fans." />
+    <meta name="keywords" content="恋与深空, Love and Deepspace, 图片画廊, 壁纸, 截图, 游戏, 乙女游戏, 沈星回, 黎深, 祁煜, Sylus, Xavier, Rafayel, wallpapers, gallery, screenshots, otome game" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Zhi+Mang+Xing&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Zhi+Mang+Xing&family=Chocolate+Classical+Sans:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playwrite+US+Trad:wght@100..400&family=Rampart+One&display=swap');
         
         body {
             font-family: 'Noto Serif SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f5f5f7;
         }
         
-        /* Artistic site title */
+        /* Default artistic site title (for English and other non-Chinese langs) */
         .site-title {
-            font-family: 'Ma Shan Zheng', 'Zhi Mang Xing', cursive;
-            letter-spacing: 0.05em;
+            font-family: 'Ma Shan Zheng', 'Zhi Mang Xing', cursive; /* Reverting to an earlier artistic choice for EN, or choose another */
+            letter-spacing: 0.08em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Default artistic site navigation description (for English etc.) */
+        .site-nav-description {
+            font-family: 'ZCOOL XiaoWei', cursive; /* Reverting to an earlier artistic choice for EN, or choose another */
+            color: #555;
+            font-size: 1em;
+        }
+
+        /* Clearer Chinese font for site title (Simplified Chinese) */
+        html[lang="zh-CN"] .site-title {
+            font-family: 'Rampart One', sans-serif !important; /* Using Rampart One for zh-CN title (fallback for 图库) */
+            font-weight: normal !important; /* Override Tailwind's font-bold and use the font's natural weight */
+            font-size: 2.2rem !important;
+        }
+
+        /* Songti-like font for site title (Traditional Chinese) - larger */
+        html[lang="zh-TW"] .site-title {
+            font-family: 'Noto Serif SC', serif !important;
+            font-weight: 600 !important; /* Semi-bold for Noto Serif SC often looks good */
+            font-size: 2.2rem !important; /* Increased size */
+        }
+
+        /* Clearer Chinese font for site navigation description (Simplified Chinese) */
+        html[lang="zh-CN"] .site-nav-description {
+            font-family: 'Zhi Mang Xing', cursive;
+            font-weight: 400;
+            font-size: 1.2em;
+        }
+
+        /* Songti-like font for site navigation description (Traditional Chinese) - larger */
+        html[lang="zh-TW"] .site-nav-description {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 500; /* Medium weight */
+            font-size: 1.15em; /* Adjusted for serif */
         }
         
         /* Stylish tags */
         .filterable-tag {
             font-family: 'ZCOOL XiaoWei', 'ZCOOL QingKe HuangYou', 'Noto Serif SC', serif;
             transition: all 0.3s ease;
+        }
+
+        /* Xingshu font for Chinese filterable tags (Simplified Chinese) */
+        html[lang="zh-CN"] .filterable-tag {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.15em;
+        }
+
+        /* Songti-like font for Chinese filterable tags (Traditional Chinese) - larger */
+        html[lang="zh-TW"] .filterable-tag {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 500; /* Medium weight */
+            font-size: 1.05em; /* Adjusted for serif */
         }
         
         /* Chinese characters specifically */
@@ -65,6 +118,15 @@
             aspect-ratio: auto;
             object-fit: cover;
         }
+
+    html[lang="en"] .site-title, html[lang="fr"] .site-title, html[lang="de"] .site-title {
+        font-family: "Playwrite US Trad", cursive !important;
+        font-weight: 300 !important; /* Available weights 100-400 */
+        font-size: 2rem !important;   /* Adjusted for visual balance */
+        font-optical-sizing: auto;
+        font-style: normal;
+        letter-spacing: 0.02em; /* Optional: for better flow */
+    }
     </style>
     <style>
         /* CSS Grid Masonry Layout */
@@ -123,16 +185,16 @@
             <div class="flex justify-between items-center w-full mb-1"> <!-- Reduced bottom margin -->
             <div class="flex items-center space-x-2">
                 <i class="fas fa-star text-yellow-400"></i>
-                <h1 class="text-2xl font-bold text-black site-title" data-i18n="siteName">恋与深空</h1>
+                <h1 class="text-2xl font-bold text-black site-title" data-i18n="siteNameGallery">Love and Deepspace Gallery</h1><span class="text-base text-gray-600 ml-2 site-nav-description" data-i18n="siteNavDescription">探索《恋与深空》的精彩瞬间</span>
             </div>
             <!-- Language Selector -->
-            <div class="relative group">
+            <div class="relative group py-2 -my-2">
                 <button id="language-selector" class="flex items-center space-x-1 bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200">
                     <i class="fas fa-globe"></i>
                     <span data-i18n="currentLang">中文简体</span>
                     <i class="fas fa-chevron-down text-xs"></i>
                 </button>
-                <div id="language-dropdown" class="absolute right-0 mt-1 bg-gray-100 text-black rounded shadow-lg hidden group-hover:block border border-gray-200 z-10">
+                <div id="language-dropdown" class="absolute right-0 top-full bg-gray-100 text-black rounded shadow-lg hidden group-hover:block border border-gray-200 z-10">
                     <ul class="py-1">
                         <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-CN">中文简体</a></li>
                         <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-TW">中文繁體</a></li>
@@ -154,6 +216,8 @@
             </div>
         </div> <!-- End of main flex container -->
     </nav>
+
+
 
     <!-- 主内容区 -->
     <div class="px-2 py-6">
