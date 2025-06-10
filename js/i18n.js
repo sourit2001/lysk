@@ -58,7 +58,8 @@ const languages = {
         '七夕': '七夕',
         '樱花': '樱花',
         '烟花': '烟花',
-        '春日': '春日'
+        '春日': '春日',
+        '拍立得': '拍立得'
     },
     'zh-TW': {
         siteName: '戀與深空',
@@ -98,7 +99,8 @@ const languages = {
         '七夕': '七夕',
         '樱花': '樱花',
         '烟花': '煙花',
-        '春日': '春日'
+        '春日': '春日',
+        '拍立得': '拍立得'
     },
     'en': {
         siteName: 'Love and Deepspace',
@@ -134,7 +136,8 @@ const languages = {
         '烟花': 'Fireworks',
         '春日': 'Spring Day',
         '写真': 'Photo Collection',
-        '动态': 'Animation'
+        '动态': 'Animation',
+        '拍立得': 'Polaroid'
     },
     'ja': {
         siteName: 'ラブアンドディープスペース',
@@ -176,7 +179,8 @@ const languages = {
         '烟花': '花火',
         '春日': '春の日',
         '写真': 'フォトコレクション',
-        '动态': 'アニメーション'
+        '动态': 'アニメーション',
+        '拍立得': 'ポラロイド'
     },
     'ko': {
         siteName: '러브 앤 딥스페이스',
@@ -219,6 +223,7 @@ const languages = {
         '春日': '봄날',
         '写真': '사진 모음',
         '动态': '애니메이션',
+        '拍立得': '폴라로이드',
         // 分页控件
         prevPageLabel: '이전',
         nextPageLabel: '다음',
@@ -259,6 +264,7 @@ const languages = {
         '春日': 'Jour de printemps',
         '写真': 'Collection de photos',
         '动态': 'Animation',
+        '拍立得': 'Polaroïd',
         // 分页控件
         prevPageLabel: 'Précédent',
         nextPageLabel: 'Suivant',
@@ -293,6 +299,7 @@ const languages = {
         Caleb: 'Caleb',
         // 标签
         '五星': '5-Sterne',
+        '拍立得': 'Polaroid',
         '四星': '4-Sterne',
         '其他': 'Andere',
         '背景': 'Hintergrund',
