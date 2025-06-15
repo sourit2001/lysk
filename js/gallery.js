@@ -9,6 +9,11 @@ let allImages = [];
 let activeFilters = new Set(); // Stores active tag strings
 let currentImageSet = []; // Holds the current set of images (all or filtered)
 
+// Simple Lightbox Elements
+const simpleLightbox = document.getElementById('simple-lightbox');
+const lightboxImage = document.getElementById('lightbox-image');
+const lightboxClose = document.getElementById('lightbox-close');
+
 // 模拟扫描images文件夹的函数（在实际部署中，这里需要由后端生成数据）
 // 由于我们不能直接访问文件系统，这里模拟数据结构
 async function fetchImagesData() {
@@ -310,6 +315,18 @@ function renderGallery(imagesToDisplay) {
         };
 
         imageCard.appendChild(imgElement);
+
+        // Create and add magnify button
+        const magnifyButton = document.createElement('div');
+        magnifyButton.className = 'magnify-button';
+        magnifyButton.innerHTML = '<i class="fas fa-expand"></i>'; // Font Awesome expand icon
+
+        magnifyButton.innerHTML = '<i class="fas fa-expand"></i>'; // Font Awesome expand icon
+        magnifyButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent card's click event from firing
+            openLightbox(image); // Open the simple lightbox
+        });
+        imageCard.appendChild(magnifyButton);
         galleryEl.appendChild(imageCard); // Append card to DOM to get its width
 
         // Calculate and set grid-row-end span
@@ -423,6 +440,24 @@ function openModal(image) {
     document.body.classList.add('overflow-hidden'); // 防止背景滚动
 }
 
+// Open Simple Lightbox
+function openLightbox(image) {
+    if (!simpleLightbox || !lightboxImage) {
+        console.error('Simple lightbox elements not found!');
+        return;
+    }
+    lightboxImage.src = image.originalSrc;
+    simpleLightbox.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+// Close Simple Lightbox
+function closeLightbox() {
+    if (!simpleLightbox) return;
+    simpleLightbox.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
 // 关闭模态框
 function closeModal() {
     const modal = document.getElementById('image-modal');
@@ -479,6 +514,22 @@ async function initGallery() {
 
 // 定义全局模态框关闭函数（供HTML调用）
 window.closeModal = closeModal;
+window.closeLightbox = closeLightbox; // Expose to global if needed, or handle listeners internally
+
+// Event listeners for simple lightbox
+if (simpleLightbox && lightboxClose) {
+    lightboxClose.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent background click if close button is clicked
+        closeLightbox();
+    });
+    simpleLightbox.addEventListener('click', () => { // Click on background to close
+        closeLightbox();
+    });
+    // Prevent clicks on the image itself from closing the lightbox
+    lightboxImage.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+}
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', initGallery);

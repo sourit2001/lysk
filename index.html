@@ -35,6 +35,33 @@
             background-color: #f5f5f7;
         }
         
+        .image-card-item {
+            position: relative; /* Needed for absolute positioning of the button */
+        }
+
+        .magnify-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            width: 32px; /* Adjust size as needed */
+            height: 32px; /* Adjust size as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px; /* Adjust icon size */
+            cursor: pointer;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.2s ease-in-out;
+            z-index: 10; /* Ensure it's above the image */
+        }
+
+        .image-card-item:hover .magnify-button {
+            opacity: 1; /* Show on hover */
+        }
+
         /* Default artistic site title (for English and other non-Chinese langs) */
         .site-title {
             font-family: 'Ma Shan Zheng', 'Zhi Mang Xing', cursive; /* Reverting to an earlier artistic choice for EN, or choose another */
@@ -175,6 +202,19 @@
             object-fit: contain;
             background-color: #f0f0f0; /* Optional background for 'contain' */
         }
+
+        #simple-lightbox {
+            cursor: pointer; /* Allow clicking background to close */
+        }
+
+        #lightbox-image {
+            cursor: default; /* Prevent image click from closing if event bubbles */
+        }
+
+        #lightbox-close {
+            cursor: pointer;
+            z-index: 61; /* Ensure close button is above image if they overlap */
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -265,6 +305,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- 简洁灯箱 -->
+    <div id="simple-lightbox" class="fixed inset-0 z-[60] flex items-center justify-center hidden bg-black bg-opacity-90">
+        <img id="lightbox-image" src="" alt="Enlarged image" class="max-h-[90vh] max-w-[90vw] object-contain">
+        <button id="lightbox-close" class="absolute top-5 right-5 text-white text-3xl font-bold hover:text-gray-300">&times;</button>
     </div>
 
     <!-- JavaScript 文件 -->
