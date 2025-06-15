@@ -297,9 +297,10 @@ function renderGallery(imagesToDisplay) {
         );
 
         if (isAnimated) {
-            imageCard.classList.add('animated-content'); // CSS applies object-fit: contain
+            imageCard.classList.add('animated-content'); // 动画图片由 animated-content 类处理其显示方式 (通常包含 object-contain)
         } else {
-            imgElement.classList.add('object-cover'); // Default to cover for static images
+            // 包括“拍立得”在内的所有非动画静态图片都使用 object-cover
+            imgElement.classList.add('object-cover'); 
         }
         
         imgElement.onerror = function() {
