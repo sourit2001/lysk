@@ -179,10 +179,15 @@
             }
         }
 
+        @media (min-width: 1280px) { /* xl screen: 4 columns */
+            #gallery-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
         /* Image card styling for Grid Masonry */
         .image-card-item {
             width: 100%; /* Item takes full width of its grid column */
-            /* height: auto; Height is determined by content and grid-row-end span */
             overflow: hidden; /* Recommended if content might exceed calculated span */
             /* grid-row-end will be set by JavaScript */
         }
@@ -202,6 +207,8 @@
         .image-card-item.animated-content .image-thumbnail {
             object-fit: contain;
             background-color: #f0f0f0; /* Optional background for 'contain' */
+            width: 100%; /* Ensure image scales with column width */
+            max-height: 220px; /* Constrain the height of images, affecting tall ones most */
         }
 
         #simple-lightbox {
@@ -210,6 +217,13 @@
 
         #lightbox-image {
             cursor: default; /* Prevent image click from closing if event bubbles */
+            display: block; /* Ensure it's a block element */
+            max-width: 90vw; /* Max width is 90% of viewport width */
+            max-height: 90vh; /* Max height is 90% of viewport height */
+            width: auto;     /* Maintain aspect ratio */
+            height: auto;    /* Maintain aspect ratio */
+            object-fit: contain; /* Scale down to fit, preserving aspect ratio */
+            margin: auto; /* Helps centering within the flex container */
         }
 
         #lightbox-close {

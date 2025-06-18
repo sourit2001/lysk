@@ -60,7 +60,8 @@ const languages = {
         '烟花': '烟花',
         '春日': '春日',
         '拍立得': '拍立得',
-        '人鱼': '人鱼'
+        '人鱼': '人鱼',
+        '手机': '手机'
     },
     'zh-TW': {
         siteName: '戀與深空',
@@ -102,7 +103,8 @@ const languages = {
         '烟花': '煙花',
         '春日': '春日',
         '拍立得': '拍立得',
-        '人鱼': '人鱼'
+        '人鱼': '人鱼',
+        '手机': '手機'
     },
     'en': {
         siteName: 'Love and Deepspace',
@@ -140,7 +142,8 @@ const languages = {
         '写真': 'Photo Collection',
         '动态': 'Animation',
         '拍立得': 'Polaroid',
-        '人鱼': 'Mermaid'
+        '人鱼': 'Mermaid',
+        '手机': 'Mobile Wallpaper'
     },
     'ja': {
         siteName: 'ラブアンドディープスペース',
@@ -184,7 +187,8 @@ const languages = {
         '写真': 'フォトコレクション',
         '动态': 'アニメーション',
         '拍立得': 'ポラロイド',
-        '人鱼': '人魚'
+        '人鱼': '人魚',
+        '手机': 'スマホ壁紙'
     },
     'ko': {
         siteName: '러브 앤 딥스페이스',
@@ -229,6 +233,7 @@ const languages = {
         '动态': '애니메이션',
         '拍立得': '폴라로이드',
         '人鱼': '인어',
+        '手机': '휴대폰 배경화면',
         // 分页控件
         prevPageLabel: '이전',
         nextPageLabel: '다음',
@@ -271,10 +276,7 @@ const languages = {
         '动态': 'Animation',
         '拍立得': 'Polaroïd',
         '人鱼': 'Sirène',
-        // 分页控件
-        prevPageLabel: 'Précédent',
-        nextPageLabel: 'Suivant',
-        pageInfoLabel: 'Page {currentPage} sur {totalPages}'
+        '手机': 'Fond d\'écran mobile'
     },
     'de': {
         siteName: 'Liebe und Tiefer Raum',
@@ -318,7 +320,8 @@ const languages = {
         '春日': 'Frühlingstag',
         '写真': 'Fotosammlung',
         '动态': 'Animation',
-        '人鱼': 'Meerjungfrau'
+        '人鱼': 'Meerjungfrau',
+        '手机': 'Handy-Hintergrundbild'
     }
 };
 

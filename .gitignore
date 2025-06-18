@@ -2,7 +2,7 @@
 node_modules/
 
 # Generated thumbnails
-images_data.json
+
 
 # macOS
 .DS_Store

@@ -78,8 +78,7 @@ async function fetchImagesData() {
                 tags: Array.isArray(img.tags) ? img.tags : [],
                 modified: img.modified // Add modified timestamp
             };
-        }).filter(imgObject => imgObject !== null) // Remove any null entries that were skipped
-          .sort((a, b) => (b.modified || 0) - (a.modified || 0)); // Sort by modification time, newest first
+        }).filter(imgObject => imgObject !== null); // Remove any null entries that were skipped
     } catch (error) {
         console.error('加载图片数据失败 (Failed to load image data):', error);
         document.getElementById('gallery-container').innerHTML = 
@@ -349,6 +348,10 @@ function renderGallery(imagesToDisplay) {
                 targetCardHeight *= 0.8; // Make animated previews 20% smaller in height.
             }
             
+            const gridAutoRowHeight = 10; // Must match grid-auto-rows in CSS (e.g., 10px)
+            const gapStyle = getComputedStyle(galleryEl).gap;
+            const gridGap = parseFloat(gapStyle.split(' ')[0]) || 8; // Default to 8px if parsing fails
+
             const rowSpan = Math.ceil((targetCardHeight + gridGap) / (gridAutoRowHeight + gridGap));
             imageCard.style.gridRowEnd = `span ${rowSpan > 0 ? rowSpan : 1}`; // Ensure span is at least 1
         });
