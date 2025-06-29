@@ -78,7 +78,8 @@ async function fetchImagesData() {
                 tags: Array.isArray(img.tags) ? img.tags : [],
                 modified: img.modified // Add modified timestamp
             };
-        }).filter(imgObject => imgObject !== null); // Remove any null entries that were skipped
+        }).filter(imgObject => imgObject !== null)
+          .sort((a, b) => (b.modified || 0) - (a.modified || 0)); // Sort by modification time, newest first
     } catch (error) {
         console.error('加载图片数据失败 (Failed to load image data):', error);
         document.getElementById('gallery-container').innerHTML = 
