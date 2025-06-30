@@ -100,7 +100,7 @@ function createTagFilters(imagesData) {
     const primaryTagsOrder = [
         "Xaiver", "Zayne", "Rafayel", "Sylus", "Caleb", 
         "主线", "五星", "写真", "生日", 
-        "春日", "樱花", "烟花", "四星" // Added more primary tags
+        "春日", "樱花", "烟花", "四星", "手机", "婚礼" // Added more primary tags
     ];
     const allUniqueTagsFromData = new Set();
     imagesData.forEach(image => {
