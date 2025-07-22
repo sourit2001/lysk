@@ -3,6 +3,8 @@
  * 实现图片加载、过滤、模态框展示等功能
  */
 
+console.log('=== GALLERY.JS LOADED ===');
+
 // 保存所有图片数据
 let allImages = [];
 // 当前应用的过滤器
@@ -141,7 +143,8 @@ function createTagFilters(imagesData) {
         moreButtonContainer.className = 'relative group'; // For group-hover to work
 
         const moreButton = document.createElement('button');
-        moreButton.className = 'tag filterable-tag py-1 px-2.5 bg-gray-100 text-black rounded text-base cursor-pointer hover:bg-gray-200 transition-all duration-150 ease-in-out flex items-center';
+        moreButton.id = 'more-tags-button'; // 为按钮添加唯一ID
+        moreButton.className = 'more-button py-1 px-2.5 bg-gray-100 text-black rounded text-base cursor-pointer hover:bg-gray-200 transition-all duration-150 ease-in-out flex items-center';
         const moreButtonTextSpan = document.createElement('span');
         moreButtonTextSpan.dataset.i18nKey = 'moreButtonText'; // For dynamic language switching if key is added to translations.json
         moreButtonTextSpan.textContent = 'More'; // Set text directly to 'More'
@@ -150,7 +153,7 @@ function createTagFilters(imagesData) {
         moreButton.innerHTML += ' <i class="fas fa-chevron-down text-xs ml-1"></i>'; // Add icon next to span
 
         const moreDropdown = document.createElement('div');
-        moreDropdown.className = 'absolute left-0 mt-1 w-auto min-w-[150px] bg-white rounded-md shadow-lg hidden group-hover:block border border-gray-200 z-20';
+        moreDropdown.className = 'absolute left-0 mt-1 w-auto min-w-[150px] bg-white rounded-md shadow-lg hidden border border-gray-200 z-20';
         // min-w-[150px] is an example, adjust as needed
 
         const moreList = document.createElement('ul');
@@ -171,7 +174,12 @@ function createTagFilters(imagesData) {
         moreDropdown.appendChild(moreList);
         moreButtonContainer.appendChild(moreButton);
         moreButtonContainer.appendChild(moreDropdown);
-        allTagsContainer.appendChild(moreButtonContainer);
+        // Append to the new parent wrapper to avoid being clipped by overflow:auto
+        if (allTagsContainer.parentElement) {
+            allTagsContainer.parentElement.appendChild(moreButtonContainer);
+        }
+
+        // 事件监听现在通过 initGallery 中的事件委托统一处理。
     }
 }
 
@@ -190,9 +198,7 @@ function createTagElement(tag) { // category parameter removed
     
     tagEl.appendChild(tagText);
     
-    tagEl.addEventListener('click', function(event) { // Capture event object
-        toggleFilter(this, event); // Pass both element and event
-    });
+
     
     return tagEl;
 }
@@ -200,7 +206,7 @@ function createTagElement(tag) { // category parameter removed
 // getTagColor function is removed as tags will have a uniform style.
 
 // 切换筛选器状态
-function toggleFilter(clickedTagEl, event) { // Add event parameter
+function toggleFilter(clickedTagEl, event) {
     const clickedTag = clickedTagEl.dataset.tag;
     const wasActive = activeFilters.has(clickedTag);
 
@@ -485,34 +491,77 @@ function clearAllFilters() {
 
 // 初始化函数
 async function initGallery() {
-    const loadingEl = document.getElementById('loading-gallery');
-    loadingEl.classList.remove('hidden');
+    const loadingEl = document.getElementById('loading-indicator');
+    if (loadingEl) loadingEl.classList.remove('hidden');
 
-    allImages = await fetchImagesData();
-    currentImageSet = allImages;
-    console.log(`fetchImagesData completed. Number of images loaded: ${allImages.length}`);
-
-    loadingEl.classList.add('hidden');
-
-    if (allImages.length > 0) {
-        const noResultsEl = document.getElementById('no-results');
-        if (noResultsEl) noResultsEl.classList.add('hidden'); // Ensure 'no results' is hidden
-        createTagFilters(allImages); 
-        renderGallery(currentImageSet);
-        updatePageTranslations(); 
-    } else {
-        // Display no results message if no images were loaded and no error message was already shown by fetchImagesData
-        const galleryContainer = document.getElementById('gallery-container');
-        const noResultsEl = document.getElementById('no-results');
-        if (galleryContainer && galleryContainer.innerHTML.trim() === '') { // Check if fetchImagesData didn't already put an error
-             if (noResultsEl) noResultsEl.classList.remove('hidden');
-        }
-        console.warn('No images to display. Gallery will be empty or show an error from fetchImagesData.');
+    try {
+        allImages = await fetchImagesData();
+        currentImageSet = allImages;
+    } catch (error) {
+        console.error("Failed to initialize gallery due to data fetch error:", error);
+        if (loadingEl) loadingEl.classList.add('hidden');
+        return; // Stop initialization if data fails to load
     }
 
-    const clearFiltersButton = document.getElementById('clear-filters-btn');
-    if (clearFiltersButton) {
-        clearFiltersButton.addEventListener('click', clearAllFilters);
+    if (loadingEl) loadingEl.classList.add('hidden');
+
+    if (allImages.length === 0) {
+        console.log("No images data to initialize gallery.");
+        return;
+    }
+
+    createTagFilters(allImages);
+    applyFilters(); // Initial render
+
+    // 统一事件委托，确保只绑定一次
+    if (!window._galleryEventHandler) {
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+
+            const moreButton = document.getElementById('more-tags-button');
+            const moreDropdown = moreButton ? moreButton.nextElementSibling : null;
+
+            // 1. More 按钮逻辑
+            if (moreButton && moreButton.contains(target)) {
+                if (moreDropdown) moreDropdown.classList.toggle('hidden');
+                return;
+            }
+
+            // 2. 标签过滤逻辑
+            const clickedTag = target.closest('.filterable-tag');
+            if (clickedTag) {
+                toggleFilter(clickedTag, event);
+                if (moreDropdown && moreDropdown.contains(clickedTag)) {
+                    moreDropdown.classList.add('hidden');
+                }
+                return;
+            }
+
+            // 3. 清除过滤器按钮
+            const clearButton = target.closest('#clear-filters-btn');
+            if (clearButton) {
+                clearAllFilters();
+                return;
+            }
+
+            // 4. 点击外部，关闭More菜单
+            if (moreDropdown && !moreDropdown.classList.contains('hidden')) {
+                if (!moreButton.contains(target) && !moreDropdown.contains(target)) {
+                    moreDropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        window._galleryEventHandler = true; // 标记为已绑定
+    }
+
+    // 语言选择器事件监听 (这个可以独立，因为它不影响其他点击)
+    const langSelector = document.getElementById('lang-selector');
+    if (langSelector && !langSelector.dataset.listenerAttached) {
+        langSelector.addEventListener('change', function() {
+            setLanguage(this.value);
+        });
+        langSelector.dataset.listenerAttached = 'true';
     }
 }
 
