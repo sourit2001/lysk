@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://www.loveanddeepspace.online/sitemap.xml
+Sitemap: https://www.loveanddeepspace.online/sitemap.xml
