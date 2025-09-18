@@ -2,8 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.loveanddeepspace.online/</loc>
-    <lastmod>2025-09-10T15:32:57.703Z</lastmod>
+    <lastmod>2025-09-18T14:20:50.587Z</lastmod>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.loveanddeepspace.online/gallery.html</loc>
+    <lastmod>2025-09-18T14:20:50.587Z</lastmod>
+    <priority>0.9</priority>
     <image:image>
       <image:loc>https://www.loveanddeepspace.online/images/Caleb/五星/Caleb- fallen cosmos1-五星日卡.png</image:loc>
       <image:title>Caleb- fallen cosmos1-五星日卡</image:title>
@@ -2339,5 +2344,15 @@
       <image:title>背景</image:title>
       <image:caption>Zayne, 背景</image:caption>
     </image:image>
+  </url>
+  <url>
+    <loc>https://www.loveanddeepspace.online/news.html</loc>
+    <lastmod>2025-09-18T14:20:50.587Z</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.loveanddeepspace.online/blog.html</loc>
+    <lastmod>2025-09-18T14:20:50.587Z</lastmod>
+    <priority>0.6</priority>
   </url>
 </urlset>
