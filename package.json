@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "main": "generate_image_data.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gen:images": "node generate_image_data.js",
+    "gen:sitemap": "node generate_sitemap.js",
+    "preview": "npx http-server -p 8080",
+    "push:new-images": "git ls-files --others --exclude-standard -z -- 'images/**' | xargs -0 git add -- && git commit -m 'feat(images): 新增原图与缩略图（增量提交）' && git push",
+    "push:data": "git add images_data.json sitemap.xml && git commit -m 'chore(data): 更新 images_data.json 与 sitemap.xml' && git push",
+    "sync:all": "npm run gen:images && npm run gen:sitemap && npm run push:new-images && npm run push:data"
   },
   "keywords": [],
   "author": "",
