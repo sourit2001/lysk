@@ -7,6 +7,7 @@ const imagesBaseDir = path.join(__dirname, 'images');
 const thumbnailsBaseDir = path.join(__dirname, 'images', 'thumbnails'); // Corrected path for thumbnails
 const outputFilePath = path.join(__dirname, 'images_data.json');
 const allowedExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+const excludedDirNames = new Set(['thumbnails', 'icons']);
 
 function getTagsFromPath(filePath, baseDir) {
     const relativePath = path.relative(baseDir, filePath);
@@ -29,14 +30,20 @@ async function scanDirectory(dirPath) { // Changed to async to handle sharp prom
         const stat = fs.statSync(itemPath);
 
         if (stat.isDirectory()) {
-            // Skip the thumbnails directory itself
-            if (itemPath === thumbnailsBaseDir) {
-                console.log(`跳过缩略图目录: ${itemPath}`);
+            // Skip excluded directories (thumbnails, icons)
+            const baseName = path.basename(itemPath);
+            if (excludedDirNames.has(baseName) || itemPath === thumbnailsBaseDir) {
+                console.log(`跳过目录: ${itemPath}`);
                 continue;
             }
             const subDirImages = await scanDirectory(itemPath); // await the recursive call
             imagesData = imagesData.concat(subDirImages);
         } else if (stat.isFile() && allowedExtensions.includes(path.extname(item).toLowerCase())) {
+            // Skip any file under an excluded directory path, just in case
+            const relFromImages = path.relative(imagesBaseDir, itemPath);
+            if (relFromImages.split(path.sep).includes('icons')) {
+                continue;
+            }
             try {
                 const buffer = fs.readFileSync(itemPath);
                 const dimensions = sizeOf(buffer);
