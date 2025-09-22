@@ -281,7 +281,7 @@
             cursor: default; /* Prevent image click from closing if event bubbles */
             display: block; /* Ensure it's a block element */
             max-width: 90vw; /* Max width is 90% of viewport width */
-            max-height: 90vh; /* Max height is 90% of viewport height */
+            max-height: 95vh; /* Slightly larger on desktop */
             width: auto;     /* Maintain aspect ratio */
             height: auto;    /* Maintain aspect ratio */
             object-fit: contain; /* Scale down to fit, preserving aspect ratio */
@@ -306,20 +306,55 @@
                     <a href="./index.html" class="hover:underline" aria-label="Home">Love and Deepspace Gallery</a>
                 </h1>
             </div>
-            <!-- Right side: Top Links + Language Selector in one row -->
-            <div class="flex items-center gap-6">
-                <nav class="hidden sm:flex items-center space-x-4 font-sans">
-                    <a href="./index.html" class="hover:text-blue-600">Home</a>
-                    <a href="./news.html" class="hover:text-blue-600">News</a>
-                    <a href="./blog.html" class="hover:text-blue-600">Blog</a>
+            <!-- Right side: Desktop inline nav + lang; Mobile hamburger -->
+            <div class="flex items-center gap-2 sm:gap-6">
+                <!-- Mobile hamburger button -->
+                <button id="mobile-menu-toggle" class="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 text-black border border-gray-200 hover:bg-gray-200" aria-label="Open menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Desktop inline nav + language (visible from sm and up) -->
+                <div class="hidden sm:flex items-center gap-4">
+                    <nav class="flex items-center space-x-4 font-sans">
+                        <a href="./index.html" class="hover:text-blue-600">Home</a>
+                        <a href="./news.html" class="hover:text-blue-600">News</a>
+                        <a href="./blog.html" class="hover:text-blue-600">Blog</a>
+                    </nav>
+                    <div class="relative group py-2 -my-2">
+                        <button id="language-selector" class="hidden sm:flex items-center space-x-1 bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200">
+                            <i class="fas fa-globe"></i>
+                            <span data-i18n="currentLang">中文简体</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="language-dropdown" class="absolute right-0 top-full bg-gray-100 text-black rounded shadow-lg hidden group-hover:block border border-gray-200 z-10">
+                            <ul class="py-1">
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-CN">中文简体</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-TW">中文繁體</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="en">English</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="ja">日本語</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="ko">한국어</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="fr">Français</a></li>
+                                <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="de">Deutsch</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div> <!-- End of First Row -->
+
+            <!-- Mobile collapsible menu -->
+            <div id="mobile-menu" class="sm:hidden hidden mt-2 border-t border-gray-200 pt-2">
+                <nav class="flex items-center justify-between px-1 text-sm">
+                    <a href="./index.html" class="py-2 px-3 rounded hover:bg-gray-100">Home</a>
+                    <a href="./news.html" class="py-2 px-3 rounded hover:bg-gray-100">News</a>
+                    <a href="./blog.html" class="py-2 px-3 rounded hover:bg-gray-100">Blog</a>
                 </nav>
-                <div class="relative group py-2 -my-2">
-                    <button id="language-selector" class="flex items-center space-x-1 bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200">
-                        <i class="fas fa-globe"></i>
-                        <span data-i18n="currentLang">中文简体</span>
+                <div class="mt-2 px-1">
+                    <button id="mobile-language-toggle" class="w-full flex items-center justify-between bg-gray-100 text-black px-3 py-2 rounded hover:bg-gray-200">
+                        <span class="inline-flex items-center gap-2"><i class="fas fa-globe"></i><span data-i18n="currentLang">中文简体</span></span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
-                    <div id="language-dropdown" class="absolute right-0 top-full bg-gray-100 text-black rounded shadow-lg hidden group-hover:block border border-gray-200 z-10">
+                    <div id="mobile-language-dropdown" class="hidden bg-gray-100 text-black rounded shadow border border-gray-200 mt-1">
                         <ul class="py-1">
                             <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-CN">中文简体</a></li>
                             <li><a href="#" class="block px-4 py-2 hover:bg-gray-200 text-black" data-lang="zh-TW">中文繁體</a></li>
@@ -332,7 +367,7 @@
                     </div>
                 </div>
             </div>
-            </div> <!-- End of First Row -->
+            
 
             <!-- Second Row removed: links moved to first row next to language selector -->
 
@@ -408,5 +443,26 @@
     <!-- JavaScript 文件 -->
     <script src="js/i18n.js"></script>
     <script src="js/gallery.js" defer></script>
+    <script>
+      // Mobile hamburger toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLangBtn = document.getElementById('mobile-language-toggle');
+        const mobileLangDropdown = document.getElementById('mobile-language-dropdown');
+
+        if (menuBtn && mobileMenu) {
+          menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+          });
+        }
+
+        if (mobileLangBtn && mobileLangDropdown) {
+          mobileLangBtn.addEventListener('click', () => {
+            mobileLangDropdown.classList.toggle('hidden');
+          });
+        }
+      });
+    </script>
 </body>
 </html>
