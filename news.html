@@ -14,33 +14,44 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900">
-  <header class="bg-white shadow">
+<body class="min-h-screen bg-black text-gray-100">
+  <header class="bg-black shadow">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <h1 class="text-xl font-semibold">Love & Deepspace Hub</h1>
       <nav class="space-x-4">
-        <a href="./index.html" class="hover:text-blue-600">Home</a>
-        <a href="./news.html" class="text-blue-600 font-semibold">News</a>
-        <a href="./gallery.html" class="hover:text-blue-600">Gallery</a>
-        <a href="./blog.html" class="hover:text-blue-600">Blog</a>
+        <a href="./index.html" class="hover:text-blue-300">Home</a>
+        <a href="./news.html" class="text-blue-300 font-semibold">News</a>
+        <a href="./gallery.html" class="hover:text-blue-300">Gallery</a>
+        <a href="./blog.html" class="hover:text-blue-300">Blog</a>
       </nav>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto px-4 py-12">
-    <section class="mb-8 bg-white rounded-lg shadow p-6">
+    <section class="mb-8 bg-neutral-900 rounded-lg shadow p-6">
       <h2 class="text-2xl font-semibold mb-2">News</h2>
-      <p class="text-gray-700">
-        The latest updates and announcements for Love and Deepspace. Stay informed with official highlights,
-        events, and community news from the Love & Deepspace Hub.
+      <p class="text-gray-300">
+        In‑depth takes on Love and Deepspace: guides, features, and behind‑the‑scenes notes
+        from the Love & Deepspace Hub.
       </p>
     </section>
-    <section class="text-center py-16 bg-white rounded-lg shadow">
-      <h2 class="text-3xl font-bold mb-3">News</h2>
-      <p class="text-gray-600">Coming soon...</p>
+    <section class="bg-neutral-900 rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Latest</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Card: Zayne Edge of Continuum -->
+        <a href="/news/2025-09-22-september-update.html" class="block group border border-gray-700 rounded-lg overflow-hidden hover:shadow transition">
+          <div class="w-full bg-gray-800 overflow-hidden h-28 sm:h-32 md:h-36">
+            <img src="/images/thumbnails/Zayne/%E4%BA%94%E6%98%9F/Edge%20of%20Continuum/Zayne-Continuum-01.png" alt="Zayne — Edge of Continuum" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+          </div>
+          <div class="p-3">
+            <h4 class="font-semibold leading-snug text-lg sm:text-xl">Zayne's New Event [Edge of Continuum] Is Coming!</h4>
+            <p class="text-xs text-gray-400 mt-1">2025-09-22</p>
+          </div>
+        </a>
+      </div>
     </section>
   </main>
 
-  <footer class="text-center text-sm text-gray-500 py-8">© Love and Deepspace</footer>
+  <footer class="text-center text-sm text-gray-400 py-8"> Love and Deepspace</footer>
 </body>
 </html>

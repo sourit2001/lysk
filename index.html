@@ -15,14 +15,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900">
-  <header class="bg-white shadow sticky top-0 z-50">
+<body class="min-h-screen bg-black text-gray-100">
+  <header class="bg-black/60 backdrop-blur supports-[backdrop-filter]:bg-black/50 shadow border-b border-white/10 sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 py-2 md:py-4 flex items-center justify-between">
       <h1 class="text-lg md:text-xl font-semibold">Love & Deepspace Hub</h1>
       <nav class="space-x-3 md:space-x-4 text-sm md:text-base">
-        <a href="./news.html" class="hover:text-blue-600">News</a>
-        <a href="./gallery.html" class="hover:text-blue-600">Gallery</a>
-        <a href="./blog.html" class="hover:text-blue-600">Blog</a>
+        <a href="./news.html" class="hover:text-blue-300">News</a>
+        <a href="./gallery.html" class="hover:text-blue-300">Gallery</a>
+        <a href="./blog.html" class="hover:text-blue-300">Blog</a>
       </nav>
     </div>
   </header>
@@ -44,52 +44,77 @@
       <p class="mt-1 text-xs text-gray-700">Love & Deepspace Hub brings together official links, timely news, and a high‑quality gallery optimized for fast browsing and search.</p>
     </section>
 
-    <!-- Links -->
-    <section class="max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8">
-      <h3 class="text-sm md:text-lg font-semibold mb-2 text-left md:text-center">Game download</h3>
-      <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
-        <a href="https://apps.apple.com/us/app/love-and-deepspace/id6443467666" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-apple text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">Apple</span>
-        </a>
-        <a href="https://play.google.com/store/apps/details?id=com.papegames.lysk.en" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-google-play text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">Google Play</span>
-        </a>
-        <a href="https://adl.netease.com/d/g/a11/c/yxlysk" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-solid fa-computer text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">PC</span>
-        </a>
-      </div>
+    <!-- Content grid: Left = Latest News, Right = Downloads + Links -->
+    <section class="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-8">
+      <div class="grid grid-cols-1 md:[grid-template-columns:2fr_1fr] gap-8 md:gap-12">
+        <!-- Left: Latest News card -->
+        <div class="bg-neutral-900 rounded-lg shadow p-4 h-full">
+          <h3 class="text-base md:text-lg font-semibold mb-3 text-yellow-300">Latest news</h3>
+          <a href="/gallery.html" class="block group rounded-lg overflow-hidden hover:shadow-lg transition border border-yellow-700/30 ring-1 ring-yellow-400/30 hover:ring-yellow-300/60 bg-gradient-to-br from-neutral-900 to-neutral-800">
+            <div class="flex items-start gap-3 sm:gap-4 p-3">
+              <!-- Image on the left -->
+              <div class="shrink-0 bg-gray-800 rounded overflow-hidden w-28 sm:w-32 md:w-40 aspect-[4/5] border border-yellow-700/20">
+                <img src="/images/thumbnails/Zayne/%E4%BA%94%E6%98%9F/Edge%20of%20Continuum/Zayne-Continuum-01.png" alt="Zayne — Edge of Continuum" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+              </div>
+              <!-- Text on the right -->
+              <div class="flex-1">
+                <h4 class="font-semibold leading-snug text-lg md:text-xl text-yellow-300">Zayne's New Event [Edge of Continuum] Is Coming!</h4>
+                <p class="text-xs text-yellow-400 mt-1">2025-09-22</p>
+                <p class="mt-2 text-base md:text-lg text-yellow-300">Should love be carved into destiny, the deity shall walk among mortals.</p>
+                <p class="mt-1 text-base md:text-lg text-yellow-300">HD pictures are posted — tap to view in Gallery.</p>
+              </div>
+            </div>
+          </a>
+        </div>
 
-      <h3 class="text-sm md:text-lg font-semibold mb-2 text-left md:text-center">offical links</h3>
-      <div class="grid grid-cols-3 gap-2 sm:gap-4">
-        <a href="https://loveanddeepspace.infoldgames.com/en-EN/home" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <img src="images/icons/official-website.webp" alt="Official Website" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover" decoding="async" loading="lazy" />
-          <span class="text-xs sm:text-base">Official Website</span>
-        </a>
-        <a href="https://x.com/Love_Deepspace" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <!-- Official X logo (inline SVG) -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1227" class="w-6 h-6" aria-hidden="true" focusable="false">
-            <path d="M714.163 519.284 1160.89 0H1056.4L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h104.49l408.73-470.615 329.454 470.615H1200L714.137 519.284h.026Zm-144.79 168.9-47.39-67.669-376.2-536.64h162.29l303.75 433.05 47.39 67.668 396.26 564.57h-162.29l-323.81-460.98Z" fill="currentColor"/>
-          </svg>
-        </a>
-        <a href="https://www.youtube.com/channel/UCSYnLE11DE8q5Q9eqbG5eTw" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-youtube text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">YouTube</span>
-        </a>
-        <a href="https://www.facebook.com/LoveandDeepspaceEN" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-facebook text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">Facebook</span>
-        </a>
-        <a href="https://www.instagram.com/loveanddeepspace/#" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-instagram text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">Instagram</span>
-        </a>
-        <a href="https://www.reddit.com/r/LoveAndDeepspace/" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 sm:gap-3 bg-white shadow-md hover:shadow-lg rounded-sm py-1.5 md:py-4">
-          <i class="fa-brands fa-reddit text-sm sm:text-xl md:text-2xl"></i>
-          <span class="text-xs sm:text-base">Reddit</span>
-        </a>
+        <!-- Right: Downloads + Official links -->
+        <div class="md:justify-self-stretch md:w-full">
+          <h3 class="text-sm md:text-lg font-semibold mb-3 text-center text-yellow-300">Game download</h3>
+          <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6 place-items-center">
+            <a href="https://apps.apple.com/us/app/love-and-deepspace/id6443467666" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-apple text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">Apple</span>
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.papegames.lysk.en" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-google-play text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">Google Play</span>
+            </a>
+            <a href="https://adl.netease.com/d/g/a11/c/yxlysk" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-solid fa-computer text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">PC</span>
+            </a>
+          </div>
+
+          <h3 class="text-sm md:text-lg font-semibold mb-3 text-center text-yellow-300">offical links</h3>
+          <div class="grid grid-cols-3 gap-3 sm:gap-4 place-items-center">
+            <a href="https://loveanddeepspace.infoldgames.com/en-EN/home" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <img src="images/icons/official-website.webp" alt="Official Website" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover" decoding="async" loading="lazy" />
+              <span class="text-xs sm:text-base">Official Website</span>
+            </a>
+            <a href="https://x.com/Love_Deepspace" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <!-- Official X logo (inline SVG) -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1227" class="w-6 h-6" aria-hidden="true" focusable="false">
+                <path d="M714.163 519.284 1160.89 0H1056.4L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h104.49l408.73-470.615 329.454 470.615H1200L714.137 519.284h.026Zm-144.79 168.9-47.39-67.669-376.2-536.64h162.29l303.75 433.05 47.39 67.668 396.26 564.57h-162.29l-323.81-460.98Z" fill="currentColor"/>
+              </svg>
+            </a>
+            <a href="https://www.youtube.com/channel/UCSYnLE11DE8q5Q9eqbG5eTw" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-youtube text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">YouTube</span>
+            </a>
+            <a href="https://www.facebook.com/LoveandDeepspaceEN" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-facebook text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">Facebook</span>
+            </a>
+            <a href="https://www.instagram.com/loveanddeepspace/#" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-instagram text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">Instagram</span>
+            </a>
+            <a href="https://www.reddit.com/r/LoveAndDeepspace/" target="_blank" rel="noopener" class="w-full max-w-[180px] h-12 md:h-14 flex items-center justify-center gap-2 sm:gap-3 bg-neutral-900 border border-gray-700 hover:border-gray-500 shadow-sm rounded-md text-yellow-300">
+              <i class="fa-brands fa-reddit text-sm sm:text-xl md:text-2xl"></i>
+              <span class="text-xs sm:text-base">Reddit</span>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   </main>

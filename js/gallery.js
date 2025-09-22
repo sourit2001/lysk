@@ -10,6 +10,11 @@ let allImages = [];
 // 当前应用的过滤器
 let activeFilters = new Set(); // Stores active tag strings
 let currentImageSet = []; // Holds the current set of images (all or filtered)
+// 增量渲染控制
+let _renderIndex = 0;
+const BATCH_SIZE = 80; // 每批渲染数量
+let _io = null; // IntersectionObserver 实例
+let _sentinelEl = null; // 观察用的哨兵元素
 
 // Simple Lightbox Elements
 const simpleLightbox = document.getElementById('simple-lightbox');
@@ -144,7 +149,7 @@ function createTagFilters(imagesData) {
 
         const moreButton = document.createElement('button');
         moreButton.id = 'more-tags-button'; // 为按钮添加唯一ID
-        moreButton.className = 'more-button py-1 px-2.5 bg-gray-100 text-black rounded text-base cursor-pointer hover:bg-gray-200 transition-all duration-150 ease-in-out flex items-center';
+        moreButton.className = 'more-button py-1 px-2.5 bg-neutral-900 text-yellow-300 rounded text-base cursor-pointer border border-yellow-700/40 hover:bg-neutral-800 hover:border-yellow-500/50 transition-all duration-150 ease-in-out flex items-center';
         const moreButtonTextSpan = document.createElement('span');
         moreButtonTextSpan.dataset.i18nKey = 'moreButtonText'; // For dynamic language switching if key is added to translations.json
         moreButtonTextSpan.textContent = 'More'; // Set text directly to 'More'
@@ -153,7 +158,7 @@ function createTagFilters(imagesData) {
         moreButton.innerHTML += ' <i class="fas fa-chevron-down text-xs ml-1"></i>'; // Add icon next to span
 
         const moreDropdown = document.createElement('div');
-        moreDropdown.className = 'absolute left-0 mt-1 w-auto min-w-[150px] bg-white rounded-md shadow-lg hidden border border-gray-200 z-20';
+        moreDropdown.className = 'absolute left-0 mt-1 w-auto min-w-[150px] bg-neutral-900 text-yellow-300 rounded-md shadow-lg hidden border border-yellow-700/40 z-20';
         // min-w-[150px] is an example, adjust as needed
 
         const moreList = document.createElement('ul');
@@ -163,8 +168,8 @@ function createTagFilters(imagesData) {
             const listItem = document.createElement('li');
             const tagInDropdown = createTagElement(tag);
             
-            // Modify class for dropdown appearance - remove button-like styles, add block/text styles
-            tagInDropdown.className = 'filterable-tag block w-full px-4 py-2 text-left text-black text-base cursor-pointer hover:bg-gray-100 transition-all duration-150 ease-in-out';
+            // Dark theme for dropdown items
+            tagInDropdown.className = 'filterable-tag block w-full px-4 py-2 text-left text-yellow-300 text-base cursor-pointer bg-neutral-900 border border-yellow-700/40 rounded hover:bg-neutral-800 hover:border-yellow-500/50 transition-all duration-150 ease-in-out';
             // Ensure dataset.tag and event listeners from createTagElement are preserved.
             
             listItem.appendChild(tagInDropdown);
@@ -187,7 +192,7 @@ function createTagFilters(imagesData) {
 function createTagElement(tag) { // category parameter removed
     const tagEl = document.createElement('div');
     // New style: clean, button-like, similar to image card style as requested
-    tagEl.className = 'tag filterable-tag py-1 px-2.5 bg-white text-black rounded text-base cursor-pointer hover:bg-gray-100 transition-all duration-150 ease-in-out';
+    tagEl.className = 'tag filterable-tag py-1 px-2.5 bg-neutral-900 text-yellow-300 rounded text-base cursor-pointer border border-yellow-700/40 hover:bg-neutral-800 hover:border-yellow-500/50 transition-all duration-150 ease-in-out';
     tagEl.dataset.tag = tag;
     tagEl.dataset.tagOrig = tag; // For translation purposes
     
@@ -213,19 +218,19 @@ function toggleFilter(clickedTagEl, event) {
     if (event && event.metaKey) { // CMD/CTRL click for multi-select
         if (wasActive) {
             activeFilters.delete(clickedTag);
-            clickedTagEl.classList.remove('bg-black', 'text-white', 'font-semibold');
-            clickedTagEl.classList.add('bg-white', 'text-black');
+            clickedTagEl.classList.remove('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
+            clickedTagEl.classList.add('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
         } else {
             activeFilters.add(clickedTag);
-            clickedTagEl.classList.remove('bg-white', 'text-black');
-            clickedTagEl.classList.add('bg-black', 'text-white', 'font-semibold');
+            clickedTagEl.classList.remove('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
+            clickedTagEl.classList.add('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
         }
     } else { // Normal click for single-select (or deselect if already active)
         if (wasActive) {
             // If it was active, just deactivate it
             activeFilters.delete(clickedTag);
-            clickedTagEl.classList.remove('bg-black', 'text-white', 'font-semibold');
-            clickedTagEl.classList.add('bg-white', 'text-black');
+            clickedTagEl.classList.remove('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
+            clickedTagEl.classList.add('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
         } else {
             // Clicked an INACTIVE tag - SELECT IT, DESELECT OTHERS
             // 1. Update the master list of active filters.
@@ -236,11 +241,11 @@ function toggleFilter(clickedTagEl, event) {
             const allTagElementsInDOM = document.querySelectorAll('.filterable-tag'); // Use common class
             allTagElementsInDOM.forEach(tagElementInLoop => {
                 if (tagElementInLoop.dataset.tag === clickedTag) { // Compare by dataset.tag
-                    tagElementInLoop.classList.remove('bg-white', 'text-black');
-                    tagElementInLoop.classList.add('bg-black', 'text-white', 'font-semibold');
+                    tagElementInLoop.classList.remove('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
+                    tagElementInLoop.classList.add('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
                 } else {
-                    tagElementInLoop.classList.remove('bg-black', 'text-white', 'font-semibold');
-                    tagElementInLoop.classList.add('bg-white', 'text-black');
+                    tagElementInLoop.classList.remove('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
+                    tagElementInLoop.classList.add('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
                 }
             });
         }
@@ -271,13 +276,28 @@ function applyFilters() {
         }
     }
     currentImageSet = imagesToProcess; // Update the current set
-    renderGallery(currentImageSet); 
+    renderGallery(currentImageSet, true); // 重置并从头渲染
 }
 
 // 渲染图库
-function renderGallery(imagesToDisplay) {
+function renderGallery(imagesToDisplay, reset = false) {
     const galleryEl = document.getElementById('gallery-container');
-    galleryEl.innerHTML = ''; // Clear previous items
+    if (reset) {
+        galleryEl.innerHTML = '';
+        _renderIndex = 0;
+        // 清理旧的 observer
+        if (_io) {
+            try { _io.disconnect(); } catch {}
+            _io = null;
+        }
+        _sentinelEl = document.createElement('div');
+        _sentinelEl.id = 'gallery-sentinel';
+        _sentinelEl.style.width = '100%';
+        _sentinelEl.style.height = '1px';
+        _sentinelEl.style.margin = '0';
+        _sentinelEl.style.padding = '0';
+        // 先插入一些内容，再把哨兵放到末尾
+    }
 
     if (imagesToDisplay.length === 0) {
         return;
@@ -290,7 +310,8 @@ function renderGallery(imagesToDisplay) {
     // More robust parsing might be needed for complex gap values.
     const gridGap = parseFloat(gapStyle.split(' ')[0]) || 8; // Default to 8px if parsing fails
 
-    imagesToDisplay.forEach((image) => {
+    const renderBatch = (batch) => {
+        batch.forEach((image) => {
         const imageCard = document.createElement('div');
         imageCard.className = 'image-card-item bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out cursor-pointer';
 
@@ -300,6 +321,7 @@ function renderGallery(imagesToDisplay) {
         // Image fills the card. Card's height will be set by grid-row-end.
         imgElement.className = 'image-thumbnail w-full h-full'; 
         imgElement.loading = 'lazy';
+        imgElement.decoding = 'async';
 
         const isAnimated = image.originalSrc && (
             image.originalSrc.toLowerCase().endsWith('.gif') ||
@@ -366,7 +388,47 @@ function renderGallery(imagesToDisplay) {
         imageCard.addEventListener('click', () => {
             openModal(image);
         });
-    });
+        });
+    };
+
+    // 计算并渲染下一批
+    const renderNextBatch = () => {
+        if (_renderIndex >= imagesToDisplay.length) return;
+        const next = imagesToDisplay.slice(_renderIndex, _renderIndex + BATCH_SIZE);
+        _renderIndex += next.length;
+        renderBatch(next);
+        // 确保哨兵在末尾
+        if (reset && !_sentinelEl.isConnected) {
+            galleryEl.appendChild(_sentinelEl);
+        } else if (_sentinelEl && _sentinelEl.parentElement !== galleryEl) {
+            galleryEl.appendChild(_sentinelEl);
+        }
+        // 如果已全部渲染，移除哨兵
+        if (_renderIndex >= imagesToDisplay.length && _sentinelEl && _sentinelEl.parentElement) {
+            _io && _io.disconnect();
+            _sentinelEl.remove();
+        }
+    };
+
+    // 初始渲染首批
+    if (reset) {
+        renderNextBatch();
+        // 使用 IntersectionObserver 监听滚动
+        _io = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    renderNextBatch();
+                }
+            }
+        }, { root: null, rootMargin: '400px 0px', threshold: 0 });
+
+        if (_sentinelEl) {
+            try { _io.observe(_sentinelEl); } catch {}
+        }
+    } else {
+        // 非 reset 情况下，继续渲染（一般不使用）
+        renderNextBatch();
+    }
 }
 
 // 打开模态框
@@ -479,10 +541,10 @@ function closeModal() {
 function clearAllFilters() {
     activeFilters.clear();
     
-    // 重置所有标签的视觉样式到默认非激活状态
+    // 重置所有标签的视觉样式到默认非激活状态（黑金主题）
     document.querySelectorAll('.tag').forEach(tagEl => {
-        tagEl.classList.remove('bg-blue-500', 'text-white', 'font-semibold');
-        tagEl.classList.add('bg-gray-100', 'text-gray-800');
+        tagEl.classList.remove('bg-yellow-400', 'text-black', 'font-semibold', 'border-yellow-400');
+        tagEl.classList.add('bg-neutral-900', 'text-yellow-300', 'border-yellow-700/40');
     });
     
     // 应用（空的）过滤器

@@ -106,6 +106,24 @@ function main() {
   xml += '    <priority>0.6</priority>\n';
   xml += '  </url>\n';
 
+  // 5) Individual News & Blog articles under their folders (flat scan)
+  const htmlDirs = ['news', 'blog'];
+  for (const dir of htmlDirs) {
+    const abs = path.join(__dirname, dir);
+    if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) {
+      const items = fs.readdirSync(abs);
+      for (const file of items) {
+        if (file.toLowerCase().endsWith('.html')) {
+          xml += '  <url>\n';
+          xml += `    <loc>${xmlEscape(urlJoin(SITE_URL, `${dir}/${file}`))}</loc>\n`;
+          xml += `    <lastmod>${xmlEscape(nowISO)}</lastmod>\n`;
+          xml += '    <priority>0.5</priority>\n';
+          xml += '  </url>\n';
+        }
+      }
+    }
+  }
+
   xml += '</urlset>\n';
 
   fs.writeFileSync(OUTPUT_XML, xml, 'utf8');
